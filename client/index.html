@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr" data-theme="mailflow" data-mode="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>mailFlow</title>
+    <script>
+      // Runs before first paint, so a light or themed session never flashes the
+      // dark default. Same storage keys as src/lib/theme.ts, which validates
+      // the values once the bundle loads.
+      (function () {
+        try {
+          var root = document.documentElement;
+          var mode = localStorage.getItem('mailflow.mode');
+          var theme = localStorage.getItem('mailflow.theme');
+          if (mode === 'light' || mode === 'dark') root.dataset.mode = mode;
+          if (theme) root.dataset.theme = theme;
+        } catch (e) {
+          /* storage unavailable: the attributes above stand */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

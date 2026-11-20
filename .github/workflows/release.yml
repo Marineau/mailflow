@@ -1,0 +1,163 @@
+# Builds the Windows installer, signs it through SignPath when the project is
+# set up there, and attaches it to a draft GitHub release.
+#
+#   git tag v0.2.0 && git push origin v0.2.0   → build, sign, draft release
+#   Actions → Release → Run workflow           → build and sign, artifact only
+#
+# Signing happens in two rounds, because the installer embeds the program:
+#   1. mailFlow.exe is signed (artifact configuration `exe`);
+#   2. the NSIS installer is built around the signed program, then signed
+#      itself (artifact configuration `installer`).
+# Both configurations are in .signpath/artifact-configurations/.
+#
+# Settings (repository → Settings → Secrets and variables → Actions):
+#   variable MS_OAUTH_CLIENT_ID       public id of the Microsoft Entra app,
+#                                     written into the app (docs/accounts.md)
+#   variable SIGNPATH_ORGANIZATION_ID set once SignPath has accepted the
+#                                     project; while it is empty, releases are
+#                                     built unsigned
+#   secret   SIGNPATH_API_TOKEN       token of the SignPath submitter user
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write # create the draft release
+  actions: read # SignPath downloads the uploaded artifacts
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # SignPath requires the same product version in every build of a
+      # release: the tag must match package.json.
+      - name: Check the tag against package.json
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+
+      - name: Typecheck and lint
+        run: |
+          npm run typecheck
+          npm run lint -w client
+
+      - name: Package the program
+        env:
+          MS_OAUTH_CLIENT_ID: ${{ vars.MS_OAUTH_CLIENT_ID }}
+        run: npm run desktop:pack
+
+      # ── Round 1: the program ────────────────────────────────────────────
+      - name: Upload the unsigned program
+        id: upload-exe
+        if: env.SIGN == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-exe
+          path: desktop/release/win-unpacked/mailFlow.exe
+          if-no-files-found: error
+
+      - name: Sign the program
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: mailflow
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: exe
+          github-artifact-id: ${{ steps.upload-exe.outputs.artifact-id }}
+          wait-for-completion: true
+          # A release waits for a person to approve it in SignPath.
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: signed-exe
+
+      - name: Put the signed program back
+        if: env.SIGN == 'true'
+        shell: bash
+        run: cp signed-exe/mailFlow.exe desktop/release/win-unpacked/mailFlow.exe
+
+      # ── The installer, built around the (signed) program ───────────────
+      - name: Build the installer
+        run: npx electron-builder --config desktop/electron-builder.config.cjs --prepackaged desktop/release/win-unpacked --win nsis
+
+      # ── Round 2: the installer ──────────────────────────────────────────
+      - name: Upload the unsigned installer
+        id: upload-installer
+        if: env.SIGN == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-installer
+          path: desktop/release/mailFlow-Setup-*.exe
+          if-no-files-found: error
+
+      - name: Sign the installer
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: mailflow
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.upload-installer.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: signed-installer
+
+      - name: Collect the installer
+        shell: bash
+        run: |
+          mkdir -p out
+          if [ "$SIGN" = "true" ]; then
+            cp signed-installer/mailFlow-Setup-*.exe out/
+          else
+            cp desktop/release/mailFlow-Setup-*.exe out/
+          fi
+          ls -l out
+
+      - name: Keep the installer as a workflow artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: installer
+          path: out/*.exe
+          if-no-files-found: error
+
+      - name: Draft the GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$SIGN" = "true" ]; then
+            note="Signed installer. Free code signing provided by SignPath.io, certificate by SignPath Foundation."
+          else
+            note="Unsigned installer: Windows SmartScreen will warn before running it (More info → Run anyway)."
+          fi
+          gh release create "$GITHUB_REF_NAME" out/*.exe --draft --title "mailFlow $GITHUB_REF_NAME" --notes "$note"

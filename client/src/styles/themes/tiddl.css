@@ -1,0 +1,580 @@
+/*
+ * Papeterie — pastel letter paper.
+ *
+ * Sky blue, cream paper, cheese yellow and candy pink; rounded shapes, a
+ * handwritten face for captions, stars and hearts sprinkled over the sky,
+ * a trail of tiny paw prints at the foot of the folder pane, cloud scallops
+ * under the top bar. The main action is a wedge of cheese, holes included.
+ * The motifs are generic and drawn below.
+ *
+ * Dark mode is the same letter paper at night: indigo sky, cream ink,
+ * cheese-yellow accent. Light mode is a summer afternoon: sky blue, cream
+ * panels, raspberry accent (dark enough for white text and for links).
+ *
+ * Artwork in `tiddl-art/`, generated from the prompts in
+ * docs/theme-assets.md (2026-11-20) and converted to WebP:
+ *   --td-scene      watercolour sky, one per mode (clouds at the foot)
+ *   --td-paper      paper grain under the list and the reader: a grey tile
+ *                   flattened to near white, multiplied over the panel
+ *   --td-sticker-*  cheese at the foot of the folders, star beside the app
+ *                   name, heart on a new message's title, envelope in the
+ *                   empty reading pane
+ *
+ * Layout of this file: tokens per mode, shared motifs, then the skin.
+ * Every skin rule is prefixed by [data-theme='tiddl']; rules for the theme
+ * preview are keyed on the preview element itself.
+ */
+
+/* ------------------------------------------------------------------ tokens */
+
+[data-theme='tiddl'][data-mode='light'] {
+  --font-sans: 'Segoe UI', Tahoma, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --color-canvas: #cfe9fb;
+  --color-surface: #fffaf0;
+  --color-surface-hover: #fff0d4;
+  --color-line: #c7d6ec;
+  --color-ink: #3a2f5b;
+  --color-ink-muted: #6c6390;
+  /* Raspberry: white text on it clears, and it reads as a link on cream. */
+  --color-accent: #c2367a;
+  --color-on-accent: #ffffff;
+  --color-warn: #b8322a;
+  --color-flag: #d99a00;
+
+  --mf-bone: #f3e8d6;
+  --mf-sweep: rgb(255 255 255 / 0.75);
+  --mf-track: #f3e8d6;
+
+  --td-scene: url('./tiddl-art/sky-day.webp');
+  --td-sky: #cfe9fb;
+  --td-panel: rgb(255 250 240 / 0.94);
+  --td-nav: rgb(255 250 240 / 0.5);
+  --td-head: #fff3dc;
+  --td-row: #fff0d4;
+  --td-row-hover: rgb(194 54 122 / 0.06);
+  --td-btn: #ffffff;
+  --td-btn-hover: #fff3dc;
+  --td-btn-edge: #9cc9ec;
+  --td-sel: #ffe1ee;
+  --td-sel-ink: #7d1c4b;
+  --td-sel-edge: #e77fb0;
+  --td-stitch: #e7a9c6;
+  --td-bar: linear-gradient(180deg, #a9d8f7, #c4e5fb);
+  --td-bar-ink: #2f2650;
+  --td-title: #d4ecfc;
+
+  --td-paws: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='70'><defs><g id='p'><ellipse cx='5' cy='7' rx='3.2' ry='2.6'/><circle cx='1.6' cy='3.2' r='1.2'/><circle cx='5' cy='1.6' r='1.2'/><circle cx='8.4' cy='3.2' r='1.2'/></g></defs><g fill='%23b49bd8' fill-opacity='.55'><use href='%23p' transform='translate(10 54) rotate(60 5 5)'/><use href='%23p' transform='translate(30 42) rotate(70 5 5)'/><use href='%23p' transform='translate(52 46) rotate(62 5 5)'/><use href='%23p' transform='translate(74 32) rotate(72 5 5)'/><use href='%23p' transform='translate(96 36) rotate(64 5 5)'/><use href='%23p' transform='translate(118 20) rotate(74 5 5)'/></g></svg>");
+}
+
+[data-theme='tiddl'][data-mode='dark'] {
+  --font-sans: 'Segoe UI', Tahoma, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --color-canvas: #17153a;
+  --color-surface: #25224f;
+  --color-surface-hover: #312d63;
+  --color-line: #3d3874;
+  --color-ink: #fdf6e3;
+  --color-ink-muted: #b8b1dc;
+  /* Cheese yellow: the one bright thing on the night paper. */
+  --color-accent: #ffd34d;
+  --color-on-accent: #3a2600;
+  --color-warn: #ff9a9a;
+  --color-flag: #ffd34d;
+
+  --mf-bone: #2e2a5e;
+  --mf-sweep: rgb(255 246 220 / 0.12);
+  --mf-track: #2e2a5e;
+
+  --td-scene: url('./tiddl-art/sky-night.webp');
+  --td-sky: #17153a;
+  --td-panel: rgb(30 27 66 / 0.94);
+  --td-nav: rgb(23 21 58 / 0.45);
+  --td-head: #2a2659;
+  --td-row: #353069;
+  --td-row-hover: rgb(255 211 77 / 0.06);
+  --td-btn: #2e2a5e;
+  --td-btn-hover: #3a3573;
+  --td-btn-edge: #5c55a3;
+  --td-sel: #3b3470;
+  --td-sel-ink: #ffe9a6;
+  --td-sel-edge: #ffd34d;
+  --td-stitch: #6a62b0;
+  --td-bar: linear-gradient(180deg, #221f52, #2b2763);
+  --td-bar-ink: #fdf6e3;
+  --td-title: #2f2a66;
+
+  --td-paws: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='70'><defs><g id='p'><ellipse cx='5' cy='7' rx='3.2' ry='2.6'/><circle cx='1.6' cy='3.2' r='1.2'/><circle cx='5' cy='1.6' r='1.2'/><circle cx='8.4' cy='3.2' r='1.2'/></g></defs><g fill='%238c84d0' fill-opacity='.5'><use href='%23p' transform='translate(10 54) rotate(60 5 5)'/><use href='%23p' transform='translate(30 42) rotate(70 5 5)'/><use href='%23p' transform='translate(52 46) rotate(62 5 5)'/><use href='%23p' transform='translate(74 32) rotate(72 5 5)'/><use href='%23p' transform='translate(96 36) rotate(64 5 5)'/><use href='%23p' transform='translate(118 20) rotate(74 5 5)'/></g></svg>");
+}
+
+/* Shared by both modes: the hand, the cheese, the paper grain. */
+[data-theme='tiddl'] {
+  /* Segoe Print ships with Windows; Comic Sans MS is the fallback elsewhere. */
+  --td-hand: 'Segoe Print', 'Comic Sans MS', 'Segoe UI', cursive;
+  --td-cheese: #ffd34d;
+  --td-cheese-deep: #eaa91f;
+  --td-crust: #b9771a;
+  --td-cheese-ink: #4a2e00;
+  --td-pink: #ff9ec7;
+  --td-paper: url('./tiddl-art/paper.webp');
+  --td-sticker-cheese: url('./tiddl-art/sticker-cheese.webp');
+  --td-sticker-star: url('./tiddl-art/sticker-star.webp');
+  --td-sticker-heart: url('./tiddl-art/sticker-heart.webp');
+  --td-sticker-envelope: url('./tiddl-art/sticker-envelope.webp');
+
+  /* A wedge of cheese: two-tone yellow and three holes. */
+  --td-cheese-fill:
+    radial-gradient(circle at 18% 38%, var(--td-cheese-deep) 0 3px, transparent 3.5px),
+    radial-gradient(circle at 82% 62%, var(--td-cheese-deep) 0 2.5px, transparent 3px),
+    radial-gradient(circle at 60% 24%, var(--td-cheese-deep) 0 1.8px, transparent 2.3px),
+    linear-gradient(180deg, #ffe58a, #ffcf3a);
+}
+
+/* ---------------------------------------------------------------- the sky */
+
+[data-theme='tiddl'] ::selection {
+  background: var(--td-pink);
+  color: #3a1430;
+}
+
+[data-theme='tiddl'] * {
+  scrollbar-color: var(--td-btn-edge) transparent;
+}
+
+[data-theme='tiddl'] .mf-app,
+[data-theme='tiddl'] .mf-stage {
+  background:
+    var(--td-scene) center bottom / cover no-repeat,
+    var(--td-sky);
+}
+
+/* The top bar: a band of sky with a row of cloud scallops along its foot. */
+[data-theme='tiddl'] .mf-titlebar {
+  border-bottom-color: transparent;
+  color: var(--td-bar-ink);
+}
+
+/* The scallop's colour has to be in the URL itself, so one image per mode. */
+[data-theme='tiddl'][data-mode='light'] .mf-titlebar {
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='6'><path fill='%23fffaf0' fill-opacity='.9' d='M0 6Q6-1 12 6Q18-1 24 6Z'/></svg>") left bottom / 24px 6px repeat-x,
+    var(--td-bar);
+}
+
+[data-theme='tiddl'][data-mode='dark'] .mf-titlebar {
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='6'><path fill='%2317153a' d='M0 6Q6-1 12 6Q18-1 24 6Z'/></svg>") left bottom / 24px 6px repeat-x,
+    var(--td-bar);
+}
+
+[data-theme='tiddl'] .mf-titlebar .mf-icon-btn {
+  color: var(--td-bar-ink);
+}
+
+[data-theme='tiddl'] .mf-titlebar-rule {
+  border-left: 2px dotted var(--td-stitch);
+}
+
+[data-theme='tiddl'] .mf-brand {
+  padding-left: 1.45em;
+  background: var(--td-sticker-star) left center / 1.15em auto no-repeat;
+  font-family: var(--td-hand);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+[data-theme='tiddl'][data-mode='light'] .mf-brand {
+  color: var(--color-accent);
+  text-shadow:
+    2px 2px 0 #ffffff,
+    3px 3px 0 #9cc9ec;
+}
+
+[data-theme='tiddl'][data-mode='dark'] .mf-brand {
+  color: var(--td-cheese);
+  text-shadow: 2px 2px 0 #4b3f9a;
+}
+
+[data-theme='tiddl'] .mf-icon {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------------------- buttons */
+
+[data-theme='tiddl'] .mf-btn,
+[data-theme='tiddl'] .mf-btn-primary {
+  border-radius: 999px;
+}
+
+[data-theme='tiddl'] .mf-btn {
+  border: 2px solid var(--td-btn-edge);
+  background: var(--td-btn);
+  box-shadow: 0 2px 0 var(--td-btn-edge);
+}
+
+[data-theme='tiddl'] .mf-btn:hover:not(:disabled) {
+  background: var(--td-btn-hover);
+}
+
+[data-theme='tiddl'] .mf-btn:active:not(:disabled),
+[data-theme='tiddl'] .mf-btn-primary:active:not(:disabled) {
+  box-shadow: none;
+  translate: 0 2px;
+}
+
+/* The main action is a wedge of cheese, in both modes. */
+[data-theme='tiddl'] .mf-btn-primary {
+  border: 2px solid var(--td-crust);
+  background: var(--td-cheese-fill);
+  color: var(--td-cheese-ink);
+  font-weight: 700;
+  box-shadow: 0 2px 0 var(--td-crust);
+  --color-on-accent: var(--td-cheese-ink);
+}
+
+[data-theme='tiddl'] .mf-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05) saturate(1.1);
+  opacity: 1;
+}
+
+[data-theme='tiddl'] .mf-icon-btn {
+  border-radius: 999px;
+}
+
+[data-theme='tiddl'] .mf-icon-btn:hover:not(:disabled) {
+  background: var(--td-row-hover);
+  color: var(--color-ink);
+}
+
+[data-theme='tiddl'] .mf-titlebar .mf-icon-btn:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.45);
+}
+
+[data-theme='tiddl'][data-mode='dark'] .mf-titlebar .mf-icon-btn:hover:not(:disabled) {
+  background: rgb(255 211 77 / 0.14);
+  color: var(--td-cheese);
+}
+
+[data-theme='tiddl'] :is(.mf-btn, .mf-btn-primary, .mf-nav-item, .mf-icon-btn):focus-visible {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* -------------------------------------------------------------- fields */
+
+[data-theme='tiddl'] .mf-input,
+[data-theme='tiddl'] .mf-select {
+  border: 2px solid var(--td-btn-edge);
+  border-radius: 999px;
+  background: var(--td-btn);
+}
+
+[data-theme='tiddl'] textarea.mf-input {
+  border-radius: var(--radius-md);
+}
+
+[data-theme='tiddl'] .mf-input:focus,
+[data-theme='tiddl'] .mf-select:focus {
+  border-color: var(--td-sel-edge);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--td-sel-edge) 25%, transparent);
+}
+
+/* ------------------------------------------------- folder pane: stickers */
+
+/* Room at the bottom for the paw prints. */
+[data-theme='tiddl'] .mf-nav {
+  border-right: 2px dashed var(--td-stitch);
+  background:
+    var(--td-sticker-cheese) right 0.75rem bottom 0.9rem / 64px auto no-repeat,
+    var(--td-paws) left 0.5rem bottom 0.75rem / 150px 70px no-repeat,
+    var(--td-nav);
+  padding-bottom: 6rem;
+}
+
+[data-theme='tiddl'] .mf-nav-item {
+  margin-block: 2px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+
+[data-theme='tiddl'] .mf-nav-item:hover:not([aria-current]) {
+  background: var(--td-btn-hover);
+  border-color: var(--td-btn-edge);
+}
+
+/* The open folder: a sticker with a stitched edge. */
+[data-theme='tiddl'] .mf-nav-item[aria-current] {
+  border: 2px dashed var(--td-sel-edge);
+  background: var(--td-sel);
+  color: var(--td-sel-ink);
+  font-weight: 600;
+  --color-ink: var(--td-sel-ink);
+}
+
+/* One pastel per folder kind, on the icon only. */
+[data-theme='tiddl'] .mf-nav-item[data-kind='inbox'] .mf-icon { color: #3d95d6; }
+[data-theme='tiddl'] .mf-nav-item[data-kind='sent'] .mf-icon { color: #d65b97; }
+[data-theme='tiddl'] .mf-nav-item[data-kind='drafts'] .mf-icon { color: #c78a12; }
+[data-theme='tiddl'] .mf-nav-item[data-kind='archive'] .mf-icon { color: #4fa37a; }
+[data-theme='tiddl'] .mf-nav-item:is([data-kind='junk'], [data-kind='banned'], [data-kind='trash']) .mf-icon {
+  color: #8a7bb8;
+}
+
+[data-theme='tiddl'][data-mode='dark'] .mf-nav-item[data-kind='inbox'] .mf-icon { color: #8fcff5; }
+[data-theme='tiddl'][data-mode='dark'] .mf-nav-item[data-kind='sent'] .mf-icon { color: #ff9ec7; }
+[data-theme='tiddl'][data-mode='dark'] .mf-nav-item[data-kind='drafts'] .mf-icon { color: #ffd34d; }
+[data-theme='tiddl'][data-mode='dark'] .mf-nav-item[data-kind='archive'] .mf-icon { color: #9be0b8; }
+[data-theme='tiddl'][data-mode='dark'] .mf-nav-item:is([data-kind='junk'], [data-kind='banned'], [data-kind='trash']) .mf-icon {
+  color: #b8b1dc;
+}
+
+/* Unread count: a little pink (or cheese) bubble. */
+[data-theme='tiddl'] .mf-badge {
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+[data-theme='tiddl'][data-mode='light'] .mf-badge {
+  background: #ff8fbf;
+  color: #4a0f2c;
+}
+
+[data-theme='tiddl'][data-mode='dark'] .mf-badge {
+  background: var(--td-cheese);
+  color: var(--td-cheese-ink);
+}
+
+/* Candy-striped progress. */
+[data-theme='tiddl'] .mf-progress {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--mf-track);
+}
+
+[data-theme='tiddl'] .mf-progress-fill {
+  border-radius: 999px;
+  background: repeating-linear-gradient(-45deg, #ff9ec7 0 6px, #ffd34d 6px 12px);
+}
+
+/* ------------------------------------------ list and reader: the paper */
+
+[data-theme='tiddl'] .mf-list,
+[data-theme='tiddl'] .mf-reader {
+  background:
+    var(--td-paper) 0 0 / 512px 512px repeat,
+    var(--td-panel);
+  background-blend-mode: multiply, normal;
+}
+
+[data-theme='tiddl'] .mf-list {
+  border-right: 2px dashed var(--td-stitch);
+}
+
+[data-theme='tiddl'] .mf-row {
+  border-bottom: 1px dotted var(--color-line);
+}
+
+[data-theme='tiddl'] .mf-row:hover:not([aria-current]) {
+  background: var(--td-row-hover);
+}
+
+/* Selected letter: warm paper with a cheese ribbon down its edge. */
+[data-theme='tiddl'] .mf-row[aria-current] {
+  background: var(--td-row);
+  box-shadow: inset 4px 0 0 var(--td-cheese);
+}
+
+[data-theme='tiddl'] .mf-unread-dot {
+  background: var(--color-accent);
+}
+
+[data-theme='tiddl'] .mf-reader-head {
+  background: var(--td-head);
+  border-bottom: 2px dashed var(--td-stitch);
+}
+
+[data-theme='tiddl'] .mf-heading {
+  font-family: var(--td-hand);
+  font-weight: 700;
+}
+
+[data-theme='tiddl'] .mf-avatar {
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffb3d2, #9cd4f7);
+  color: #3a2f5b;
+  font-weight: 700;
+  box-shadow: 0 1px 0 var(--td-btn-edge);
+}
+
+[data-theme='tiddl'] .mf-reader-empty {
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+[data-theme='tiddl'] .mf-reader-empty::before {
+  content: '';
+  width: 96px;
+  height: 71px;
+  background: var(--td-sticker-envelope) center / contain no-repeat;
+  rotate: -6deg;
+}
+
+/* The remote-content warning: a yellow sticky note, in both modes. */
+[data-theme='tiddl'] .mf-infobar {
+  background: #fff1a8;
+  color: #5a4210;
+  border-bottom: 2px dashed #e0b84a;
+  --color-ink: #5a4210;
+  --color-ink-muted: #7a5c1c;
+}
+
+/* ------------------------------------------------------------- windows */
+
+[data-theme='tiddl'] .mf-window,
+[data-theme='tiddl'] .mf-toast,
+[data-theme='tiddl'] .mf-popover {
+  border: 2px solid var(--td-btn-edge);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 3px 0 var(--td-btn-edge),
+    0 14px 30px rgb(58 47 91 / 0.22);
+}
+
+/* The title strip is the head of a letter sheet, stitched underneath. */
+[data-theme='tiddl'] .mf-window-title {
+  border-bottom: 2px dashed var(--td-stitch);
+  background: var(--td-title);
+  font-family: var(--td-hand);
+  font-weight: 700;
+}
+
+[data-theme='tiddl'] .mf-window-composer .mf-window-title {
+  padding-left: 2.6rem;
+  background:
+    var(--td-sticker-heart) left 0.8rem center / 1.35rem auto no-repeat,
+    var(--td-title);
+}
+
+[data-theme='tiddl'] .mf-window-min,
+[data-theme='tiddl'] .mf-window-close {
+  border-radius: 999px;
+}
+
+[data-theme='tiddl'] .mf-window-min:hover {
+  background: var(--td-btn-hover);
+}
+
+[data-theme='tiddl'] .mf-window-close:hover {
+  background: #ff9ec7;
+  color: #4a0f2c;
+}
+
+[data-theme='tiddl'] .mf-window-foot {
+  border-top: 2px dashed var(--td-stitch);
+}
+
+[data-theme='tiddl'] .mf-theme-card[aria-checked='true'] {
+  border: 2px dashed var(--td-sel-edge);
+}
+
+/* -------------------------------------------------------------- taskbar */
+
+[data-theme='tiddl'] .mf-taskbar {
+  border-top: 2px dashed var(--td-stitch);
+  background: var(--td-bar);
+}
+
+/* --------------------------------------------------------- theme preview */
+
+.mf-thumb[data-theme='tiddl'] {
+  background:
+    var(--td-scene) center bottom / cover no-repeat,
+    var(--td-sky);
+  border-color: var(--td-btn-edge);
+}
+
+.mf-thumb[data-theme='tiddl'] .mf-thumb-bar {
+  background: var(--td-bar);
+  border-bottom: 1px dashed var(--td-stitch);
+}
+
+.mf-thumb[data-theme='tiddl'] .mf-thumb-brand {
+  background: var(--color-accent);
+  border-radius: 999px;
+}
+
+.mf-thumb[data-theme='tiddl'] .mf-thumb-field {
+  border-radius: 999px;
+}
+
+.mf-thumb[data-theme='tiddl'] .mf-thumb-cta {
+  background: var(--td-cheese-fill);
+  background-size: auto;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--td-crust);
+}
+
+.mf-thumb[data-theme='tiddl'] .mf-thumb-nav .mf-thumb-sel {
+  background: var(--td-sel);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--td-sel-edge);
+}
+
+.mf-thumb[data-theme='tiddl'] .mf-thumb-list,
+.mf-thumb[data-theme='tiddl'] .mf-thumb-reader {
+  background: var(--td-panel);
+}
+
+.mf-thumb[data-theme='tiddl'] .mf-thumb-list .mf-thumb-sel {
+  background: var(--td-row);
+  box-shadow: inset 2px 0 0 var(--td-cheese);
+}
+
+/* ------------------------------------------- button fill: candy stripes */
+
+/*
+ * A button fills with pastel candy stripes, drifting slowly, and its
+ * leading edge is a dotted stitch line, like the seams of the panels.
+ * Grown by width rather than clipped, so the stitch has an edge to sit on.
+ */
+[data-theme='tiddl'] .mf-fill {
+  inset: 0 auto 0 0;
+  width: calc(var(--mf-fill, 0) * 100%);
+  clip-path: none;
+  border-right: 2px dotted var(--td-stitch);
+  background: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--td-pink) 50%, transparent) 0 7px,
+      rgb(255 255 255 / 0.42) 7px 14px
+    )
+    0 0 / 20px 20px;
+  animation: td-fill-candy 1.4s linear infinite;
+}
+
+[data-theme='tiddl'][data-mode='dark'] .mf-fill {
+  background: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--td-pink) 38%, transparent) 0 7px,
+      color-mix(in srgb, var(--td-cheese) 22%, transparent) 7px 14px
+    )
+    0 0 / 20px 20px;
+}
+
+[data-theme='tiddl'] .mf-fill::after {
+  display: none;
+}
+
+@keyframes td-fill-candy {
+  to {
+    background-position: 20px 0;
+  }
+}

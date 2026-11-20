@@ -1,0 +1,295 @@
+@import 'tailwindcss';
+@import './styles/themes/mailflow.css';
+@import './styles/themes/vista.css';
+@import './styles/themes/win98.css';
+@import './styles/themes/win11.css';
+@import './styles/themes/waterraria.css';
+@import './styles/themes/pocket.css';
+@import './styles/themes/tiddl.css';
+
+/*
+ * Busy cursor (lib/busyCursor.ts): the frame of the current theme, written
+ * into the variable while a loader is on screen. Set on <html> and inherited,
+ * so it only replaces the plain arrow: links, text fields and resize handles
+ * keep their own cursor, as Windows does with "working in background".
+ */
+html[data-busy] {
+  cursor: var(--mf-busy-cursor, progress);
+}
+
+/*
+ * Inter ships with the app (variable font, SIL Open Font License — see
+ * assets/fonts/Inter-LICENSE.txt). It is the original theme's typeface; the
+ * other themes name system fonts and never download it. No italic file: the
+ * interface sets none in this theme.
+ */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./assets/fonts/InterVariable.woff2') format('woff2');
+}
+
+/*
+ * Appearance — see lib/theme.ts.
+ *
+ * `@theme` only registers the tokens with Tailwind, so `bg-canvas` and
+ * friends exist. The values that actually apply come from
+ * `styles/themes/*.css`, one block per `[data-theme][data-mode]`; the ones
+ * below are the mailFlow dark palette, shown if those attributes are missing.
+ *
+ * Two rules keep themes independent of each other:
+ *   - a component never names a color outside these tokens;
+ *   - a skin changes shape only through the `.mf-*` hook classes, and every
+ *     skin rule is prefixed by its own `[data-theme='…']`.
+ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-canvas: oklch(0.16 0.01 265);
+  --color-surface: oklch(0.2 0.012 265);
+  --color-surface-hover: oklch(0.24 0.014 265);
+  --color-line: oklch(0.28 0.012 265);
+  --color-ink: oklch(0.95 0.005 265);
+  --color-ink-muted: oklch(0.68 0.012 265);
+  --color-accent: oklch(0.68 0.15 255);
+  /* Text on an accent fill. */
+  --color-on-accent: oklch(0.16 0.01 265);
+  /* Errors and warnings, as text. */
+  --color-warn: oklch(0.828 0.189 84.429);
+  /* The follow-up star: an icon fill, so it can stay brighter than `warn`. */
+  --color-flag: oklch(0.828 0.189 84.429);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+[data-mode='light'] {
+  color-scheme: light;
+}
+
+[data-mode='dark'] {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Barres de défilement discrètes : la liste de mails en contient trois. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+/*
+ * Height of the taskbar while it shows (components/Taskbar.tsx). Floating
+ * windows read it to stay above the bar. A theme that draws the bar at
+ * another height sets this variable to match.
+ */
+.mf-app[data-taskbar] {
+  --mf-taskbar-h: 3rem;
+}
+
+/* Squelettes : les blocs sont fixes, une seule nappe lumineuse les traverse. */
+.mf-bone {
+  display: block;
+  border-radius: 0.25rem;
+  background-color: var(--mf-bone, oklch(0.27 0.014 265));
+}
+
+.mf-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.mf-sweep-light {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  /* Au-dessus des blocs : sinon leur fond opaque masque entièrement la nappe. */
+  background: linear-gradient(
+    100deg,
+    transparent 28%,
+    var(--mf-sweep, oklch(0.9 0.03 255 / 0.42)) 50%,
+    transparent 72%
+  );
+  animation: mf-sweep 1.35s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.mf-indet-track {
+  height: 2px;
+  overflow: hidden;
+  background: var(--mf-track, oklch(0.28 0.012 265));
+}
+
+.mf-indet-bar {
+  height: 100%;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  animation: mf-indet 1.05s ease-in-out infinite;
+}
+
+@keyframes mf-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes mf-indet {
+  0% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(340%);
+  }
+}
+
+/*
+ * Progress filling a button behind its label (components/ProgressFill.tsx).
+ * The button carries `relative isolate`: the fill sits at z-index -1, above
+ * the button's own background and below its text. The level is `--mf-fill`
+ * (0 to 1), written by script; each theme redraws `.mf-fill` in its own idiom
+ * and may grow it another way (Récif rises from the bottom).
+ *
+ * Here, the original theme: a soft accent wash revealed from the left, with a
+ * light sheen travelling over the filled part only.
+ */
+.mf-fill {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  clip-path: inset(0 calc((1 - var(--mf-fill, 0)) * 100%) 0 0);
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-accent) 14%, transparent),
+    color-mix(in oklab, var(--color-accent) 34%, transparent)
+  );
+  transition: opacity 0.42s ease;
+}
+
+/*
+ * On an accent button, a lighter wash: the accent on itself would not show.
+ * `:where` keeps this at the weight of `.mf-fill` alone: every theme's
+ * `[data-theme] .mf-fill` must win over it, though this file comes last.
+ */
+:where(.mf-btn-primary) > .mf-fill {
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.3));
+}
+
+.mf-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.22), transparent);
+  animation: mf-fill-sheen 1.8s ease-in-out infinite;
+}
+
+.mf-fill[data-state='done'] {
+  opacity: 0;
+}
+
+@keyframes mf-fill-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
+  }
+}
+
+/*
+ * Compose area: white paper with a mail client's default text, so the colors
+ * and fonts picked here look the way most recipients will see them.
+ */
+.mf-editor {
+  background: #ffffff;
+  color: #1f2328;
+  color-scheme: light;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.mf-editor-surface {
+  min-height: 100%;
+  outline: none;
+}
+
+.mf-editor-surface p {
+  margin: 0;
+}
+
+.mf-editor-surface a {
+  color: #1155cc;
+  text-decoration: underline;
+}
+
+.mf-editor-surface p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: #8b929b;
+  pointer-events: none;
+}
+
+.mf-inline-shot {
+  display: block;
+  max-width: 100%;
+  max-height: 20rem;
+  width: auto;
+  height: auto;
+  margin: 0.5rem 0;
+  border-radius: 0.375rem;
+  border: 1px solid #d0d7de;
+  background: #f6f8fa;
+}
+
+.mf-inline-shot.ProseMirror-selectednode {
+  outline: 2px solid var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mf-sweep-light {
+    animation: none;
+    opacity: 0;
+  }
+
+  .mf-indet-bar {
+    animation: none;
+    width: 100%;
+    opacity: 0.85;
+  }
+
+  /* The level still moves: it is the information. Only decoration stops. */
+  .mf-fill,
+  .mf-fill::before,
+  .mf-fill::after {
+    animation: none !important;
+  }
+
+  .mf-fill::after {
+    opacity: 0;
+  }
+}

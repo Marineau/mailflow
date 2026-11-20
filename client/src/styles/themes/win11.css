@@ -1,0 +1,583 @@
+/*
+ * Épure — after the Fluent look of Windows 11.
+ *
+ * The reference is a WinUI app such as Settings or Mail: a Mica backdrop
+ * (the window takes a faint tint from the wallpaper behind it), a navigation
+ * pane sitting directly on it, and the content on a lighter layer whose top
+ * left corner is rounded. Controls are quiet: a hairline border that is a
+ * little stronger on its bottom edge, four-pixel corners, a text field marked
+ * by its bottom line. Selection is a soft fill plus a short accent pill.
+ * Menus and toasts are acrylic: translucent, blurred, eight-pixel corners.
+ *
+ * Both modes are stock: light is the default Windows 11 scheme with its
+ * blue accent, dark is the system dark scheme with the light blue accent.
+ *
+ * Scrollbars are left to index.css: thin and token-colored is already what
+ * Windows 11 draws at rest.
+ *
+ * Layout of this file: tokens per mode, then the skin. Every skin rule is
+ * prefixed by [data-theme='win11']; rules for the theme preview are keyed on
+ * the preview element itself.
+ */
+
+/* ------------------------------------------------------------------ tokens */
+
+[data-theme='win11'][data-mode='light'] {
+  /* The Variable cut ships with Windows 11; Windows 10 falls back to Segoe UI. */
+  --font-sans: 'Segoe UI Variable Text', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --color-canvas: #ffffff;
+  --color-surface: #f3f3f3;
+  --color-surface-hover: #eaeaea;
+  --color-line: #e5e5e5;
+  --color-ink: #1a1a1a;
+  --color-ink-muted: #5f5f5f;
+  --color-accent: #005fb8;
+  --color-on-accent: #ffffff;
+  --color-warn: #9d5d00;
+  --color-flag: #eaa300;
+
+  --mf-bone: #ebebeb;
+  --mf-sweep: rgb(255 255 255 / 0.8);
+  --mf-track: transparent;
+
+  /* Mica: the solid base, and the same base with the wallpaper showing. */
+  --w11-base: #f3f3f3;
+  --w11-mica:
+    radial-gradient(60% 90% at 10% 0%, rgb(186 214 247 / 0.4), transparent 70%),
+    radial-gradient(50% 80% at 92% 6%, rgb(244 206 226 / 0.3), transparent 70%), #f3f3f3;
+  /* The layer the content sits on. */
+  --w11-layer: rgb(255 255 255 / 0.5);
+
+  /* Control fill and its three-part stroke. */
+  --w11-fill: rgb(255 255 255 / 0.7);
+  --w11-fill-hot: rgb(249 249 249 / 0.5);
+  --w11-fill-down: rgb(249 249 249 / 0.3);
+  --w11-stroke: rgb(0 0 0 / 0.06);
+  --w11-stroke-top: rgb(0 0 0 / 0.06);
+  --w11-stroke-bottom: rgb(0 0 0 / 0.16);
+  --w11-accent-stroke: rgb(255 255 255 / 0.08);
+  --w11-accent-stroke-bottom: rgb(0 0 0 / 0.4);
+
+  /* Subtle fill: controls with no resting background. */
+  --w11-subtle-hot: rgb(0 0 0 / 0.04);
+  --w11-subtle-down: rgb(0 0 0 / 0.025);
+  --w11-subtle-sel: rgb(0 0 0 / 0.055);
+  --w11-row-sel: color-mix(in srgb, var(--color-accent) 10%, transparent);
+
+  --w11-field-focus: #ffffff;
+  --w11-field-line: rgb(0 0 0 / 0.45);
+
+  --w11-flyout: rgb(252 252 252 / 0.85);
+  --w11-flyout-edge: rgb(0 0 0 / 0.06);
+  --w11-flyout-shadow: 0 8px 16px rgb(0 0 0 / 0.14);
+  --w11-window-edge: rgb(117 117 117 / 0.4);
+  --w11-window-shadow: 0 32px 64px rgb(0 0 0 / 0.19), 0 2px 21px rgb(0 0 0 / 0.15);
+
+  --w11-info: #fff4ce;
+  --w11-info-edge: rgb(0 0 0 / 0.06);
+  --w11-track: rgb(0 0 0 / 0.14);
+  --w11-danger: #c42b1c;
+}
+
+[data-theme='win11'][data-mode='dark'] {
+  --font-sans: 'Segoe UI Variable Text', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --color-canvas: #272727;
+  --color-surface: #2e2e2e;
+  --color-surface-hover: #383838;
+  --color-line: #3a3a3a;
+  --color-ink: #ffffff;
+  --color-ink-muted: #c8c8c8;
+  --color-accent: #60cdff;
+  --color-on-accent: #000000;
+  --color-warn: #fce100;
+  --color-flag: #fcb900;
+
+  --mf-bone: #333333;
+  --mf-sweep: rgb(255 255 255 / 0.14);
+  --mf-track: transparent;
+
+  --w11-base: #202020;
+  --w11-mica:
+    radial-gradient(60% 90% at 10% 0%, rgb(46 78 130 / 0.17), transparent 70%),
+    radial-gradient(50% 80% at 92% 6%, rgb(98 54 96 / 0.13), transparent 70%), #202020;
+  --w11-layer: rgb(58 58 58 / 0.3);
+
+  --w11-fill: rgb(255 255 255 / 0.06);
+  --w11-fill-hot: rgb(255 255 255 / 0.085);
+  --w11-fill-down: rgb(255 255 255 / 0.035);
+  /* On dark it is the top edge that catches the light. */
+  --w11-stroke: rgb(255 255 255 / 0.07);
+  --w11-stroke-top: rgb(255 255 255 / 0.1);
+  --w11-stroke-bottom: rgb(255 255 255 / 0.07);
+  --w11-accent-stroke: rgb(255 255 255 / 0.08);
+  --w11-accent-stroke-bottom: rgb(0 0 0 / 0.14);
+
+  --w11-subtle-hot: rgb(255 255 255 / 0.06);
+  --w11-subtle-down: rgb(255 255 255 / 0.04);
+  --w11-subtle-sel: rgb(255 255 255 / 0.085);
+  --w11-row-sel: color-mix(in srgb, var(--color-accent) 17%, transparent);
+
+  --w11-field-focus: rgb(30 30 30 / 0.7);
+  --w11-field-line: rgb(255 255 255 / 0.54);
+
+  --w11-flyout: rgb(44 44 44 / 0.9);
+  --w11-flyout-edge: rgb(0 0 0 / 0.25);
+  --w11-flyout-shadow: 0 8px 16px rgb(0 0 0 / 0.26);
+  --w11-window-edge: rgb(117 117 117 / 0.4);
+  --w11-window-shadow: 0 32px 64px rgb(0 0 0 / 0.37), 0 2px 21px rgb(0 0 0 / 0.37);
+
+  --w11-info: #433519;
+  --w11-info-edge: rgb(0 0 0 / 0.1);
+  --w11-track: rgb(255 255 255 / 0.2);
+  --w11-danger: #ff99a4;
+}
+
+/* ------------------------------------------------------ backdrop and bars */
+
+[data-theme='win11'] body {
+  background: var(--w11-base);
+}
+
+[data-theme='win11'] ::selection {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* `.mf-stage`: the consent and error screens, one window alone on the backdrop. */
+[data-theme='win11'] .mf-app,
+[data-theme='win11'] .mf-stage {
+  background: var(--w11-mica);
+}
+
+/* The top bar belongs to the backdrop: no fill, no rule under it. */
+[data-theme='win11'] .mf-titlebar {
+  border-bottom-color: transparent;
+}
+
+/* -------------------------------------------------------------- buttons */
+
+[data-theme='win11'] .mf-btn {
+  border: 1px solid;
+  border-color: var(--w11-stroke-top) var(--w11-stroke) var(--w11-stroke-bottom);
+  border-radius: 4px;
+  background: var(--w11-fill);
+  color: var(--color-ink);
+}
+
+[data-theme='win11'] .mf-btn:hover:not(:disabled) {
+  background: var(--w11-fill-hot);
+}
+
+/* Pressed: the control loses its relief and its text dims. */
+[data-theme='win11'] .mf-btn:active:not(:disabled) {
+  border-color: var(--w11-stroke);
+  background: var(--w11-fill-down);
+  color: var(--color-ink-muted);
+}
+
+[data-theme='win11'] .mf-btn-primary {
+  border: 1px solid var(--w11-accent-stroke);
+  border-bottom-color: var(--w11-accent-stroke-bottom);
+  border-radius: 4px;
+}
+
+[data-theme='win11'] .mf-btn-primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 90%, transparent);
+  opacity: 1;
+}
+
+[data-theme='win11'] .mf-btn-primary:active:not(:disabled) {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--color-accent) 80%, transparent);
+}
+
+[data-theme='win11'] .mf-icon-btn,
+[data-theme='win11'] .mf-select {
+  border-radius: 4px;
+}
+
+[data-theme='win11'] .mf-icon-btn:hover:not(:disabled),
+[data-theme='win11'] .mf-select:hover {
+  background: var(--w11-subtle-hot);
+}
+
+[data-theme='win11'] .mf-icon-btn:active:not(:disabled) {
+  background: var(--w11-subtle-down);
+  color: var(--color-ink-muted);
+}
+
+[data-theme='win11'] .mf-icon-btn[aria-pressed='true'] {
+  background: var(--w11-subtle-sel);
+  box-shadow: inset 0 0 0 1px var(--w11-stroke);
+}
+
+/* ---------------------------------------------------------------- fields */
+
+/* The bottom line is the field: grey at rest, accent and thicker in use. */
+[data-theme='win11'] .mf-input {
+  border: 1px solid var(--w11-stroke);
+  border-radius: 4px;
+  background: var(--w11-fill);
+  box-shadow: inset 0 -1px 0 var(--w11-field-line);
+}
+
+[data-theme='win11'] .mf-input:hover {
+  background: var(--w11-fill-hot);
+}
+
+[data-theme='win11'] .mf-input:focus {
+  border-color: var(--w11-stroke);
+  background: var(--w11-field-focus);
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+}
+
+/* ------------------------------------------------------- navigation pane */
+
+[data-theme='win11'] .mf-nav {
+  border-right-color: transparent;
+}
+
+[data-theme='win11'] .mf-nav-item {
+  position: relative;
+  border-radius: 4px;
+  background: none;
+  color: var(--color-ink);
+}
+
+[data-theme='win11'] .mf-nav-item:hover {
+  background: var(--w11-subtle-hot);
+}
+
+[data-theme='win11'] .mf-nav-item[aria-current] {
+  background: var(--w11-subtle-sel);
+}
+
+/* The selection pill. */
+[data-theme='win11'] .mf-nav-item[aria-current]::before,
+[data-theme='win11'] .mf-row[aria-current]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--color-accent);
+  transform: translateY(-50%);
+}
+
+[data-theme='win11'] .mf-badge {
+  padding: 0;
+  background: none;
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------- the content */
+
+/* List and reading pane share one layer; its outer corner is the list's. */
+[data-theme='win11'] .mf-list {
+  border: 1px solid var(--color-line);
+  border-bottom: 0;
+  border-top-left-radius: 8px;
+  background: var(--w11-layer);
+}
+
+[data-theme='win11'] .mf-reader {
+  border-top: 1px solid var(--color-line);
+  background: var(--color-canvas);
+}
+
+/* Rows float inside the list instead of being ruled off from each other. */
+[data-theme='win11'] .mf-row {
+  position: relative;
+  margin: 2px 4px 0;
+  border-bottom-color: transparent;
+  border-radius: 4px;
+}
+
+[data-theme='win11'] .mf-row:hover {
+  background: var(--w11-subtle-hot);
+}
+
+[data-theme='win11'] .mf-row[aria-current] {
+  background: var(--w11-row-sel);
+}
+
+/* A row is several lines tall: the pill follows it. */
+[data-theme='win11'] .mf-row[aria-current]::before {
+  top: 14px;
+  bottom: 14px;
+  height: auto;
+  transform: none;
+}
+
+[data-theme='win11'] .mf-heading {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+[data-theme='win11'] .mf-avatar {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+}
+
+/* An InfoBar is a card set into the page, not a band across it. */
+[data-theme='win11'] .mf-infobar {
+  margin: 8px 12px;
+  border: 1px solid var(--w11-info-edge);
+  border-radius: 4px;
+  background: var(--w11-info);
+  color: var(--color-ink);
+  --color-ink-muted: var(--color-ink);
+}
+
+[data-theme='win11'] .mf-infobar + .mf-infobar {
+  margin-top: 0;
+}
+
+/* --------------------------------------------------- windows and popups */
+
+[data-theme='win11'] .mf-window {
+  border: 1px solid var(--w11-window-edge);
+  border-radius: 8px;
+  background: var(--w11-base);
+  box-shadow: var(--w11-window-shadow);
+}
+
+[data-theme='win11'] .mf-window[data-dragging] {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 1px var(--color-accent),
+    var(--w11-window-shadow);
+}
+
+[data-theme='win11'] .mf-window-title {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 0 0 0 12px;
+  border-bottom: 0;
+}
+
+/* Caption text is small and regular. */
+[data-theme='win11'] .mf-window-title > :first-child {
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+/* The caption button fills the corner and turns red under the pointer. */
+[data-theme='win11'] .mf-window-close {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  width: 46px;
+  padding: 0;
+  border-radius: 0;
+  color: var(--color-ink);
+}
+
+[data-theme='win11'] .mf-window-close:hover {
+  background: #c42b1c;
+  color: #ffffff;
+}
+
+[data-theme='win11'] .mf-window-close:active {
+  background: rgb(196 43 28 / 0.9);
+  color: rgb(255 255 255 / 0.7);
+}
+
+[data-theme='win11'] .mf-window-close svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.25;
+}
+
+/* Content on the lighter layer, commands on the base under a hairline. */
+[data-theme='win11'] .mf-window-body {
+  border-top: 1px solid var(--color-line);
+  background: var(--color-canvas);
+}
+
+[data-theme='win11'] .mf-window-foot {
+  background: var(--w11-base);
+}
+
+/* Acrylic. */
+[data-theme='win11'] .mf-popover,
+[data-theme='win11'] .mf-toast {
+  border-color: var(--w11-flyout-edge);
+  border-radius: 8px;
+  background: var(--w11-flyout);
+  -webkit-backdrop-filter: blur(30px) saturate(1.25);
+  backdrop-filter: blur(30px) saturate(1.25);
+  box-shadow: var(--w11-flyout-shadow);
+}
+
+[data-theme='win11'] .mf-option {
+  width: calc(100% - 8px);
+  margin: 0 4px;
+  border-radius: 4px;
+}
+
+[data-theme='win11'] .mf-option[aria-selected='true'] {
+  background: var(--w11-subtle-sel);
+}
+
+[data-theme='win11'] .mf-theme-card {
+  border-radius: 8px;
+}
+
+/* -------------------------------------------------------------- progress */
+
+[data-theme='win11'] .mf-progress {
+  background: var(--w11-track);
+}
+
+[data-theme='win11'] .mf-toast .mf-progress {
+  height: 3px;
+  background: transparent;
+}
+
+[data-theme='win11'] .mf-progress-fill,
+[data-theme='win11'] .mf-indet-bar {
+  border-radius: 999px;
+}
+
+[data-theme='win11'] .mf-progress-fill[data-state='error'] {
+  background: var(--w11-danger);
+}
+
+[data-theme='win11'] .mf-indet-bar {
+  background: var(--color-accent);
+}
+
+/* ------------------------------------------------- minimize and taskbar */
+
+/* Minimize fills its slot of the caption like close, and turns grey, not red. */
+[data-theme='win11'] .mf-window-min {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  width: 46px;
+  padding: 0;
+  border-radius: 0;
+  color: var(--color-ink);
+}
+
+[data-theme='win11'] .mf-window-min:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-ink);
+}
+
+[data-theme='win11'] .mf-window-min svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.25;
+}
+
+[data-theme='win11'] .mf-window-min + .mf-window-close {
+  margin-left: -4px;
+}
+
+/*
+ * The taskbar: Mica, centred buttons, each a flat tile that lights up under
+ * the pointer, with the short grey pill a background window wears.
+ */
+[data-theme='win11'] .mf-taskbar {
+  justify-content: center;
+  gap: 4px;
+  border-top: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-surface) 86%, transparent);
+  backdrop-filter: blur(24px) saturate(1.6);
+}
+
+[data-theme='win11'] .mf-taskbar-item {
+  position: relative;
+  height: 40px;
+  border-color: transparent;
+  background: transparent;
+}
+
+[data-theme='win11'] .mf-taskbar-item:hover:not(:disabled) {
+  border-color: var(--w11-stroke);
+  background: var(--w11-fill-hot);
+}
+
+[data-theme='win11'] .mf-taskbar-item::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: 6px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-ink-muted);
+  transform: translateX(-50%);
+}
+
+/* --------------------------------------------------------- theme preview */
+
+.mf-thumb[data-theme='win11'] {
+  background: var(--w11-mica);
+}
+
+.mf-thumb[data-theme='win11'] .mf-thumb-bar {
+  border-bottom-color: transparent;
+}
+
+.mf-thumb[data-theme='win11'] .mf-thumb-field {
+  background: var(--w11-fill);
+  box-shadow:
+    inset 0 0 0 1px var(--w11-stroke),
+    inset 0 -1px 0 var(--w11-field-line);
+}
+
+.mf-thumb[data-theme='win11'] .mf-thumb-nav {
+  border-right-color: transparent;
+}
+
+.mf-thumb[data-theme='win11'] .mf-thumb-nav .mf-thumb-sel {
+  background:
+    linear-gradient(var(--color-accent), var(--color-accent)) left center / 2px 6px no-repeat,
+    var(--w11-subtle-sel);
+}
+
+.mf-thumb[data-theme='win11'] .mf-thumb-list {
+  border-top: 1px solid var(--color-line);
+  border-left: 1px solid var(--color-line);
+  border-top-left-radius: 5px;
+  background: var(--w11-layer);
+}
+
+.mf-thumb[data-theme='win11'] .mf-thumb-list .mf-thumb-sel {
+  margin: 1px 2px;
+  border-bottom-color: transparent;
+  border-radius: 2px;
+  background:
+    linear-gradient(var(--color-accent), var(--color-accent)) left center / 2px 50% no-repeat,
+    var(--w11-row-sel);
+}
+
+.mf-thumb[data-theme='win11'] .mf-thumb-reader {
+  border-top: 1px solid var(--color-line);
+  background: var(--color-canvas);
+}
+
+/* ------------------------------------------------ button fill: flat accent */
+
+/* Flat, like the system's progress bar: the accent, a rounded leading edge, no sheen. */
+[data-theme='win11'] .mf-fill {
+  clip-path: inset(0 calc((1 - var(--mf-fill, 0)) * 100%) 0 0 round 0 4px 4px 0);
+  background: color-mix(in srgb, var(--color-accent) 26%, transparent);
+}
+
+[data-theme='win11'] .mf-btn-primary > .mf-fill {
+  background: rgb(255 255 255 / 0.24);
+}
+
+[data-theme='win11'] .mf-fill::after {
+  display: none;
+}

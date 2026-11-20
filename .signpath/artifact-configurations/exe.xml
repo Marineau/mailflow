@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Round 1 of .github/workflows/release.yml: the program alone.
+     Paste into SignPath as the artifact configuration with slug `exe`. -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file path="mailFlow.exe" product-name="mailFlow">
+      <authenticode-sign/>
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

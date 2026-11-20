@@ -1,0 +1,808 @@
+/*
+ * Arène — a floodlit stadium menu.
+ *
+ * A floodlit stadium behind everything, a huge ghost title in the top-left
+ * corner, content laid out as vivid gradient tiles framed in electric blue,
+ * the focused tile outlined in white with a glow. Buttons are skewed navy
+ * plates in a glowing blue frame, the main action framed in orange. Windows
+ * carry a ribbon in their top corner. Orange (the "boost" tokens) stays for
+ * counts and progress.
+ *
+ * Dark mode is the night match. Light mode is the same arena by day: pale
+ * sky over the stands, white panels, same tiles and frames.
+ *
+ * The stadium is a picture (`pocket-art/`, generated in Firefly from the
+ * prompts in docs/theme-assets.md), one per mode, under a scrim that keeps
+ * the panels readable.
+ *
+ * Layout of this file: tokens per mode, then the skin. Every skin rule is
+ * prefixed by [data-theme='pocket']; rules for the theme preview are keyed
+ * on the preview element itself.
+ */
+
+/* ------------------------------------------------------------------ tokens */
+
+[data-theme='pocket'][data-mode='dark'] {
+  --font-sans: Bahnschrift, 'Arial Narrow', 'Segoe UI', sans-serif;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.125rem;
+  --radius-lg: 0.125rem;
+
+  --color-canvas: #040b1a;
+  --color-surface: #0b1834;
+  --color-surface-hover: #12254a;
+  --color-line: #1a3360;
+  --color-ink: #f2f7ff;
+  --color-ink-muted: #8ea6c9;
+  --color-accent: #ff7a18;
+  --color-on-accent: #1a0d04;
+  --color-warn: #ffb020;
+  --color-flag: #ffc23d;
+
+  --mf-bone: #132650;
+  --mf-sweep: rgb(47 164 255 / 0.2);
+  --mf-track: #132650;
+
+  /* Electric-blue tile frame, and the white one of the focused tile. */
+  --pl-frame: #2f9dff;
+  --pl-frame-soft: rgb(47 157 255 / 0.38);
+  --pl-frame-hot: #e8f6ff;
+  --pl-glow: rgb(64 178 255 / 0.55);
+  /* Panels float over the stadium: translucent, blurred behind. */
+  --pl-panel: rgb(5 14 34 / 0.8);
+  /* The reading pane lets more of the stadium through: it holds less text. */
+  --pl-panel-reader: rgb(5 14 34 / 0.55);
+  --pl-panel-head: linear-gradient(180deg, rgb(19 46 94 / 0.85), rgb(8 20 46 / 0.6));
+  /*
+   * Buttons are tinted glass: blue for all, orange for the main action. The
+   * stadium shows through, blurred. `-hot` is the hovered state, denser.
+   */
+  --pl-plate: linear-gradient(
+    180deg,
+    rgb(70 160 255 / 0.34),
+    rgb(20 80 190 / 0.2) 55%,
+    rgb(10 40 110 / 0.4)
+  );
+  --pl-plate-hot: linear-gradient(
+    180deg,
+    rgb(100 185 255 / 0.5),
+    rgb(30 105 225 / 0.34) 55%,
+    rgb(14 56 140 / 0.52)
+  );
+  --pl-plate-ink: #e6f3ff;
+  --pl-cta: linear-gradient(
+    180deg,
+    rgb(255 150 60 / 0.36),
+    rgb(220 90 20 / 0.2) 55%,
+    rgb(120 40 0 / 0.44)
+  );
+  --pl-cta-hot: linear-gradient(
+    180deg,
+    rgb(255 170 80 / 0.52),
+    rgb(235 105 25 / 0.34) 55%,
+    rgb(140 50 0 / 0.56)
+  );
+  --pl-cta-ink: #ffb45c;
+  --pl-cta-ink-hot: #ffe0b8;
+  --pl-plate-shadow: 0 1px 2px rgb(0 0 0 / 0.45);
+  --pl-ghost: rgb(230 240 255 / 0.16);
+  /* Level badge and XP bar. */
+  --pl-boost: linear-gradient(180deg, #ffc04a, #ff7a18);
+  --pl-boost-ink: #1a0d04;
+  --pl-boost-edge: rgb(0 0 0 / 0.35);
+  /* Folder tiles at rest: lighter blue glass than the buttons. */
+  --pl-nav-glass: linear-gradient(
+    180deg,
+    rgb(70 160 255 / 0.18),
+    rgb(20 80 190 / 0.1) 55%,
+    rgb(10 40 110 / 0.28)
+  );
+  --pl-nav-glass-hot: var(--pl-plate-hot);
+  --pl-row: linear-gradient(90deg, rgb(47 157 255 / 0.32), rgb(47 157 255 / 0.08));
+  --pl-arena: url('./pocket-art/arena-night.webp');
+  --pl-scrim: linear-gradient(
+    180deg,
+    rgb(2 6 16 / 0.3),
+    rgb(2 6 16 / 0.05) 45%,
+    rgb(2 6 16 / 0.45)
+  );
+  --pl-backdrop: #040b1a;
+}
+
+[data-theme='pocket'][data-mode='light'] {
+  --font-sans: Bahnschrift, 'Arial Narrow', 'Segoe UI', sans-serif;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.125rem;
+  --radius-lg: 0.125rem;
+
+  --color-canvas: #dcebfa;
+  --color-surface: #f7fbff;
+  --color-surface-hover: #e3f0fc;
+  --color-line: #b8d0ea;
+  --color-ink: #0a1a33;
+  --color-ink-muted: #4a6283;
+  /* Darker than the night orange: it is also read as text on white. */
+  --color-accent: #e8650a;
+  --color-on-accent: #1a0d04;
+  --color-warn: #b42318;
+  --color-flag: #d98a00;
+
+  --mf-bone: #d3e3f4;
+  --mf-sweep: rgb(22 131 232 / 0.16);
+  --mf-track: #d3e3f4;
+
+  --pl-frame: #1683e8;
+  --pl-frame-soft: rgb(22 131 232 / 0.32);
+  /* White would vanish on the white panels. */
+  --pl-frame-hot: #0b3d91;
+  --pl-glow: rgb(22 131 232 / 0.45);
+  --pl-panel: rgb(250 253 255 / 0.86);
+  --pl-panel-reader: rgb(250 253 255 / 0.66);
+  --pl-panel-head: linear-gradient(180deg, rgb(214 233 252 / 0.95), rgb(240 247 255 / 0.7));
+  /*
+   * By day the glass stays as clear as at night: a light tint, and the
+   * lettering takes the deep shade of the tint instead of white.
+   */
+  --pl-plate: linear-gradient(
+    180deg,
+    rgb(90 170 250 / 0.3),
+    rgb(40 130 235 / 0.16) 55%,
+    rgb(22 100 210 / 0.28)
+  );
+  --pl-plate-hot: linear-gradient(
+    180deg,
+    rgb(90 170 250 / 0.46),
+    rgb(40 130 235 / 0.28) 55%,
+    rgb(22 100 210 / 0.42)
+  );
+  --pl-plate-ink: #0b3d91;
+  --pl-plate-shadow: 0 1px 0 rgb(255 255 255 / 0.7);
+  --pl-cta: linear-gradient(
+    180deg,
+    rgb(255 165 80 / 0.32),
+    rgb(245 120 30 / 0.16) 55%,
+    rgb(220 90 10 / 0.28)
+  );
+  --pl-cta-hot: linear-gradient(
+    180deg,
+    rgb(255 165 80 / 0.48),
+    rgb(245 120 30 / 0.28) 55%,
+    rgb(220 90 10 / 0.42)
+  );
+  --pl-cta-ink: #a83f00;
+  --pl-cta-ink-hot: #8a3300;
+  --pl-ghost: rgb(10 26 51 / 0.12);
+  /* Same treatment for the level badge: a tint and deep orange digits. */
+  --pl-boost: linear-gradient(180deg, rgb(255 175 70 / 0.3), rgb(255 122 24 / 0.22));
+  --pl-boost-ink: #a83f00;
+  --pl-boost-edge: rgb(232 101 10 / 0.65);
+  /* Folder tiles at rest: frosted white glass. */
+  --pl-nav-glass: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.62),
+    rgb(240 247 255 / 0.42) 55%,
+    rgb(225 238 252 / 0.55)
+  );
+  --pl-nav-glass-hot: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.8),
+    rgb(225 240 255 / 0.62) 55%,
+    rgb(205 228 252 / 0.72)
+  );
+  --pl-row: linear-gradient(90deg, rgb(22 131 232 / 0.2), rgb(22 131 232 / 0.04));
+  --pl-arena: url('./pocket-art/arena-day.webp');
+  --pl-scrim: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.25),
+    rgb(255 255 255 / 0) 45%,
+    rgb(255 255 255 / 0.2)
+  );
+  --pl-backdrop: #dcebfa;
+}
+
+/*
+ * Tile colours, one per folder kind, the same in both modes (white type on
+ * every one of them). Declared on the theme alone so the preview cards of
+ * other themes never see them.
+ */
+[data-theme='pocket'] {
+  --pl-tile-inbox: linear-gradient(135deg, #18b7a6, #0a6f9c 60%, #0c3f7a);
+  --pl-tile-sent: linear-gradient(135deg, #ffb21e, #ff5a1a 55%, #c4201e);
+  --pl-tile-drafts: linear-gradient(135deg, #c04de0, #7a2bc9 55%, #3b1c8f);
+  --pl-tile-archive: linear-gradient(135deg, #8edc4a, #2f9e5a 55%, #135a52);
+  --pl-tile-junk: linear-gradient(135deg, #7a3bd1, #c2338f 55%, #ff8a2a);
+  --pl-tile-banned: linear-gradient(135deg, #ff5d5d, #b3122e 60%, #5c0a26);
+  --pl-tile-trash: linear-gradient(135deg, #3fb8ff, #1a63d6 55%, #142f8a);
+  --pl-tile-folder: linear-gradient(135deg, #3a6fd6, #1b3c8c 60%, #0e1f52);
+}
+
+/* ------------------------------------------------------------- the arena */
+
+[data-theme='pocket'] ::selection {
+  background: var(--pl-frame);
+  color: #fff;
+}
+
+[data-theme='pocket'] * {
+  scrollbar-color: var(--pl-frame-soft) transparent;
+}
+
+/* The stadium under its scrim, and a blue rule along the bottom edge. */
+[data-theme='pocket'] .mf-app,
+[data-theme='pocket'] .mf-stage {
+  background:
+    var(--pl-scrim),
+    var(--pl-arena) center 40% / cover no-repeat,
+    var(--pl-backdrop);
+  box-shadow: inset 0 -2px 0 var(--pl-frame);
+}
+
+/* The top bar is a dark band fading into the stands, no plate of its own. */
+[data-theme='pocket'] .mf-titlebar {
+  position: relative;
+  border-bottom-color: transparent;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.55), transparent);
+  box-shadow: inset 0 -1px 0 var(--pl-frame-soft);
+}
+
+[data-theme='pocket'][data-mode='light'] .mf-titlebar {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.75), transparent);
+}
+
+/* The ghost title in the corner. */
+[data-theme='pocket'] .mf-brand {
+  color: var(--pl-ghost);
+  font-size: 2.6rem;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+[data-theme='pocket'] .mf-titlebar-rule {
+  border-color: var(--pl-frame-soft);
+}
+
+/* --------------------------------------------------------------- buttons */
+
+/*
+ * The plate skews, the label does not. Two pseudo-elements, both skewed:
+ * `::before` is the glass (tint, blur of what lies behind, top gloss,
+ * frame), `::after` the shine that sweeps across it. The caption is a text
+ * node and cannot be un-skewed on its own, hence the pseudo-elements.
+ */
+
+[data-theme='pocket'] .mf-btn,
+[data-theme='pocket'] .mf-btn-primary {
+  position: relative;
+  isolation: isolate;
+  min-height: 2.5rem;
+  padding-inline: 1.5rem;
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: var(--pl-plate-shadow);
+}
+
+[data-theme='pocket'] .mf-btn {
+  color: var(--pl-plate-ink);
+}
+
+[data-theme='pocket'] .mf-btn::before,
+[data-theme='pocket'] .mf-btn-primary::before,
+[data-theme='pocket'] .mf-btn::after,
+[data-theme='pocket'] .mf-btn-primary::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  transform: skewX(-14deg);
+}
+
+[data-theme='pocket'] .mf-btn::before,
+[data-theme='pocket'] .mf-btn-primary::before {
+  --pl-fill: var(--pl-plate);
+  --pl-edge: var(--pl-frame);
+  --pl-halo: var(--pl-frame-soft);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.2), transparent 45%),
+    var(--pl-fill);
+  backdrop-filter: blur(8px) saturate(1.4);
+  box-shadow:
+    inset 0 0 0 2px var(--pl-edge),
+    inset 0 1px 0 3px rgb(255 255 255 / 0.12),
+    0 0 10px var(--pl-halo);
+  transition:
+    box-shadow 0.18s,
+    filter 0.18s;
+}
+
+/*
+ * The shine: a pale band on an image three plates wide, parked off the
+ * right edge. Hovering slides it off the left edge (sweeping right to left);
+ * leaving lets the same transition run back (left to right). No blend mode:
+ * the button is isolated, so `screen` would blend with nothing and vanish.
+ */
+[data-theme='pocket'] .mf-btn::after,
+[data-theme='pocket'] .mf-btn-primary::after {
+  background: linear-gradient(
+      105deg,
+      transparent 42%,
+      rgb(255 255 255 / 0.2) 46%,
+      rgb(255 255 255 / 0.55) 50%,
+      rgb(255 255 255 / 0.2) 54%,
+      transparent 58%
+    )
+    0% 0 / 300% 100% no-repeat;
+  transition: background-position 0.6s cubic-bezier(0.3, 0.6, 0.3, 1);
+}
+
+[data-theme='pocket'] .mf-btn:hover:not(:disabled)::after,
+[data-theme='pocket'] .mf-btn:focus-visible::after,
+[data-theme='pocket'] .mf-btn-primary:hover:not(:disabled)::after,
+[data-theme='pocket'] .mf-btn-primary:focus-visible::after {
+  background-position: 100% 0;
+}
+
+[data-theme='pocket'] .mf-btn:hover:not(:disabled)::before,
+[data-theme='pocket'] .mf-btn:focus-visible::before {
+  --pl-fill: var(--pl-plate-hot);
+  --pl-edge: #7fd0ff;
+  --pl-halo: var(--pl-glow);
+  filter: brightness(1.08);
+}
+
+/* The main action: the same glass, tinted, framed and lettered in orange. */
+[data-theme='pocket'] .mf-btn-primary {
+  color: var(--pl-cta-ink);
+}
+
+[data-theme='pocket'] .mf-btn-primary::before {
+  --pl-fill: var(--pl-cta);
+  --pl-edge: #ff8a1f;
+  --pl-halo: rgb(255 122 24 / 0.4);
+}
+
+[data-theme='pocket'] .mf-btn-primary:hover:not(:disabled),
+[data-theme='pocket'] .mf-btn-primary:focus-visible {
+  color: var(--pl-cta-ink-hot);
+}
+
+[data-theme='pocket'] .mf-btn-primary:hover:not(:disabled)::before,
+[data-theme='pocket'] .mf-btn-primary:focus-visible::before {
+  --pl-fill: var(--pl-cta-hot);
+  --pl-edge: #ffb45c;
+  --pl-halo: rgb(255 122 24 / 0.6);
+  filter: brightness(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='pocket'] .mf-btn::after,
+  [data-theme='pocket'] .mf-btn-primary::after {
+    transition: none;
+  }
+}
+
+[data-theme='pocket'] .mf-icon-btn {
+  border-radius: 2px;
+}
+
+[data-theme='pocket'] .mf-icon-btn:hover:not(:disabled) {
+  background: var(--pl-frame-soft);
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--pl-frame);
+}
+
+/* ---------------------------------------------------------------- fields */
+
+[data-theme='pocket'] .mf-input,
+[data-theme='pocket'] .mf-select {
+  border-radius: 0;
+  border-color: var(--pl-frame-soft);
+  background: var(--pl-panel);
+}
+
+[data-theme='pocket'] .mf-input:focus,
+[data-theme='pocket'] .mf-field:focus {
+  border-color: var(--pl-frame);
+  box-shadow: 0 0 10px var(--pl-glow);
+}
+
+/* -------------------------------------------------- folder pane: the tiles */
+
+[data-theme='pocket'] .mf-nav {
+  border-right-color: transparent;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.35), transparent);
+}
+
+[data-theme='pocket'][data-mode='light'] .mf-nav {
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.55), transparent);
+}
+
+/*
+ * Each folder is a glass plate like the buttons: same skew, same gloss and
+ * frame, same shine sweep. The inset keeps the slanted corners inside the
+ * scrolling column, which would otherwise clip them.
+ */
+[data-theme='pocket'] .mf-nav-item {
+  --pl-tile: var(--pl-tile-folder);
+  position: relative;
+  isolation: isolate;
+  min-height: 2.5rem;
+  margin: 3px 7px;
+  border-radius: 0;
+  background: transparent;
+  font-style: italic;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: var(--pl-plate-shadow);
+}
+
+[data-theme='pocket'] .mf-nav-item:hover:not([aria-current]) {
+  background: transparent;
+}
+
+[data-theme='pocket'] .mf-nav-item[data-kind='inbox'] { --pl-tile: var(--pl-tile-inbox); }
+[data-theme='pocket'] .mf-nav-item[data-kind='sent'] { --pl-tile: var(--pl-tile-sent); }
+[data-theme='pocket'] .mf-nav-item[data-kind='drafts'] { --pl-tile: var(--pl-tile-drafts); }
+[data-theme='pocket'] .mf-nav-item[data-kind='archive'] { --pl-tile: var(--pl-tile-archive); }
+[data-theme='pocket'] .mf-nav-item[data-kind='junk'] { --pl-tile: var(--pl-tile-junk); }
+[data-theme='pocket'] .mf-nav-item[data-kind='banned'] { --pl-tile: var(--pl-tile-banned); }
+[data-theme='pocket'] .mf-nav-item[data-kind='trash'] { --pl-tile: var(--pl-tile-trash); }
+
+/*
+ * The plate: the tile's own colour as a strip down its left edge, then the
+ * gloss, then the glass. `::after` is the shine, shared with the buttons.
+ */
+[data-theme='pocket'] .mf-nav-item::before,
+[data-theme='pocket'] .mf-nav-item::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  transform: skewX(-14deg);
+}
+
+[data-theme='pocket'] .mf-nav-item::before {
+  --pl-fill: var(--pl-nav-glass);
+  --pl-edge: var(--pl-frame-soft);
+  --pl-halo: transparent;
+  background:
+    var(--pl-tile) left / 6px 100% no-repeat,
+    linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 45%),
+    var(--pl-fill);
+  backdrop-filter: blur(8px) saturate(1.4);
+  box-shadow:
+    inset 0 0 0 1px var(--pl-edge),
+    0 0 10px var(--pl-halo);
+  transition:
+    box-shadow 0.18s,
+    filter 0.18s;
+}
+
+[data-theme='pocket'] .mf-nav-item::after {
+  background: linear-gradient(
+      105deg,
+      transparent 42%,
+      rgb(255 255 255 / 0.2) 46%,
+      rgb(255 255 255 / 0.55) 50%,
+      rgb(255 255 255 / 0.2) 54%,
+      transparent 58%
+    )
+    0% 0 / 300% 100% no-repeat;
+  transition: background-position 0.6s cubic-bezier(0.3, 0.6, 0.3, 1);
+}
+
+[data-theme='pocket'] .mf-nav-item:hover::after,
+[data-theme='pocket'] .mf-nav-item:focus-visible::after {
+  background-position: 100% 0;
+}
+
+[data-theme='pocket'] .mf-nav-item:hover:not([aria-current]),
+[data-theme='pocket'] .mf-nav-item:focus-visible:not([aria-current]) {
+  color: var(--color-ink);
+}
+
+[data-theme='pocket'] .mf-nav-item:hover:not([aria-current])::before,
+[data-theme='pocket'] .mf-nav-item:focus-visible:not([aria-current])::before {
+  --pl-fill: var(--pl-nav-glass-hot);
+  --pl-edge: var(--pl-frame);
+  --pl-halo: var(--pl-glow);
+  box-shadow:
+    inset 0 0 0 2px var(--pl-edge),
+    0 0 12px var(--pl-halo);
+}
+
+/* The focused tile: full colour, hot frame, glow, white type. */
+[data-theme='pocket'] .mf-nav-item[aria-current] {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+  --color-ink: #fff;
+  --color-ink-muted: rgb(255 255 255 / 0.8);
+}
+
+[data-theme='pocket'] .mf-nav-item[aria-current]::before {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.22), transparent 45%),
+    var(--pl-tile);
+  box-shadow:
+    inset 0 0 0 2px var(--pl-frame-hot),
+    0 0 14px var(--pl-glow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='pocket'] .mf-nav-item::after {
+    transition: none;
+  }
+}
+
+/* Count badges: an orange plate. */
+[data-theme='pocket'] .mf-badge {
+  min-width: 1.5rem;
+  border-radius: 3px;
+  background: var(--pl-boost);
+  color: var(--pl-boost-ink);
+  font-weight: 700;
+  font-style: normal;
+  text-align: center;
+  text-shadow: none;
+  box-shadow: inset 0 0 0 1px var(--pl-boost-edge);
+}
+
+/* By day, on a coloured tile, the tinted badge would vanish: make it solid. */
+[data-theme='pocket'][data-mode='light'] .mf-nav-item[aria-current] .mf-badge {
+  background: rgb(255 255 255 / 0.9);
+}
+
+/* XP bar. */
+[data-theme='pocket'] .mf-progress {
+  border-radius: 0;
+  background: rgb(0 0 0 / 0.45);
+  box-shadow: inset 0 0 0 1px var(--pl-frame-soft);
+}
+
+[data-theme='pocket'] .mf-progress-fill {
+  border-radius: 0;
+  /* Solid in both modes: a bar has no lettering to carry its colour. */
+  background: linear-gradient(180deg, #ffc04a, #ff7a18);
+}
+
+/* --------------------------------------------- list and reader: the panels */
+
+[data-theme='pocket'] .mf-list,
+[data-theme='pocket'] .mf-reader {
+  background: var(--pl-panel);
+  backdrop-filter: blur(6px);
+}
+
+[data-theme='pocket'] .mf-reader {
+  background: var(--pl-panel-reader);
+}
+
+[data-theme='pocket'] .mf-list {
+  border-right-color: var(--pl-frame-soft);
+  box-shadow: inset 1px 0 0 var(--pl-frame-soft);
+}
+
+[data-theme='pocket'] .mf-row {
+  border-bottom-color: rgb(127 170 230 / 0.14);
+}
+
+[data-theme='pocket'] .mf-row:hover:not([aria-current]) {
+  background: rgb(47 157 255 / 0.08);
+  box-shadow: inset 0 0 0 1px var(--pl-frame-soft);
+}
+
+[data-theme='pocket'] .mf-row[aria-current] {
+  background: var(--pl-row);
+  box-shadow:
+    inset 0 0 0 2px var(--pl-frame-hot),
+    inset 0 0 14px var(--pl-glow);
+}
+
+[data-theme='pocket'] .mf-unread-dot {
+  border-radius: 0;
+  background: var(--pl-frame);
+  transform: skewX(-14deg);
+  box-shadow: 0 0 6px var(--pl-glow);
+}
+
+[data-theme='pocket'] .mf-reader-head {
+  background: var(--pl-panel-head);
+  border-bottom-color: var(--pl-frame-soft);
+}
+
+/* The player icon: a framed square with a blue gradient. */
+[data-theme='pocket'] .mf-avatar {
+  border-radius: 3px;
+  background: linear-gradient(160deg, #3fb8ff, #1a3f9c);
+  color: #fff;
+  font-style: italic;
+  box-shadow:
+    inset 0 0 0 2px var(--pl-frame-hot),
+    0 0 10px var(--pl-glow);
+}
+
+[data-theme='pocket'] .mf-heading {
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* The remote-content warning, as a player banner: dark plate, boost strip. */
+[data-theme='pocket'] .mf-infobar {
+  background:
+    linear-gradient(90deg, #ff7a18 0 4px, transparent 4px),
+    linear-gradient(90deg, rgb(18 70 60 / 0.92), rgb(6 20 40 / 0.92));
+  color: #f2f7ff;
+  border-bottom-color: var(--pl-frame-soft);
+  --color-ink: #f2f7ff;
+  --color-ink-muted: #b5c7e2;
+}
+
+/* ---------------------------------------------------------------- windows */
+
+[data-theme='pocket'] .mf-window,
+[data-theme='pocket'] .mf-toast,
+[data-theme='pocket'] .mf-popover {
+  border-radius: 0;
+  border-color: var(--pl-frame);
+  box-shadow:
+    0 0 0 1px var(--pl-frame),
+    0 0 24px var(--pl-glow),
+    0 20px 50px rgb(0 0 0 / 0.5);
+}
+
+/* Team ribbon: a slanted blue tab across the top-right corner. */
+[data-theme='pocket'] .mf-window-title {
+  position: relative;
+  background: var(--pl-panel-head);
+  border-bottom-color: var(--pl-frame-soft);
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-theme='pocket'] .mf-window-title::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 7.5rem;
+  height: 5px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--pl-frame) 30%, #7fd0ff);
+  clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+[data-theme='pocket'] .mf-window-foot {
+  border-top-color: var(--pl-frame-soft);
+}
+
+[data-theme='pocket'] .mf-theme-card[aria-pressed='true'],
+[data-theme='pocket'] .mf-theme-card[aria-checked='true'] {
+  border-color: var(--pl-frame-hot);
+  box-shadow: 0 0 0 1px var(--pl-frame), 0 0 12px var(--pl-glow);
+}
+
+/* -------------------------------------------------------------- taskbar */
+
+/* A dark band along the touchline; the buttons are the usual glass plates. */
+[data-theme='pocket'] .mf-app[data-taskbar] {
+  --mf-taskbar-h: 3.5rem;
+}
+
+[data-theme='pocket'] .mf-taskbar {
+  height: 3.5rem;
+  gap: 0.75rem;
+  padding-inline: 1.25rem;
+  border-top: 1px solid var(--pl-frame-soft);
+  background: linear-gradient(0deg, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.3));
+  backdrop-filter: blur(8px);
+}
+
+[data-theme='pocket'][data-mode='light'] .mf-taskbar {
+  background: linear-gradient(0deg, rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.5));
+}
+
+[data-theme='pocket'] .mf-taskbar-item {
+  width: 13rem;
+}
+
+/* --------------------------------------------------------- theme preview */
+
+.mf-thumb[data-theme='pocket'] {
+  background:
+    var(--pl-scrim),
+    var(--pl-arena) center 40% / cover no-repeat,
+    var(--pl-backdrop);
+  border-color: var(--pl-frame);
+}
+
+.mf-thumb[data-theme='pocket'] .mf-thumb-bar {
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.45), transparent);
+  border-bottom-color: var(--pl-frame-soft);
+}
+
+.mf-thumb[data-theme='pocket'] .mf-thumb-brand {
+  width: 2.25rem;
+  height: 0.5rem;
+  background: var(--pl-ghost);
+  transform: skewX(-14deg);
+}
+
+.mf-thumb[data-theme='pocket'] .mf-thumb-field {
+  background: var(--pl-panel);
+  box-shadow: inset 0 0 0 1px var(--pl-frame-soft);
+}
+
+.mf-thumb[data-theme='pocket'] .mf-thumb-cta {
+  transform: skewX(-14deg);
+  border-radius: 0;
+  background: var(--pl-cta);
+  box-shadow: inset 0 0 0 1px #ff8a1f;
+}
+
+.mf-thumb[data-theme='pocket'] .mf-thumb-list,
+.mf-thumb[data-theme='pocket'] .mf-thumb-reader {
+  background: var(--pl-panel);
+}
+
+.mf-thumb[data-theme='pocket'] .mf-thumb-nav .mf-thumb-sel {
+  background: var(--pl-tile-inbox);
+  box-shadow: inset 0 0 0 1px var(--pl-frame-hot);
+}
+
+.mf-thumb[data-theme='pocket'] .mf-thumb-list .mf-thumb-sel {
+  background: var(--pl-row);
+  box-shadow: inset 0 0 0 1px var(--pl-frame-hot);
+}
+
+/* ------------------------------------------ button fill: the boost gauge */
+
+/*
+ * A button fills like the boost gauge: orange, crossed by speed stripes that
+ * keep running, slanted with the glass plate it sits on.
+ */
+[data-theme='pocket'] .mf-fill {
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(115deg, rgb(255 255 255 / 0.24) 0 5px, transparent 5px 14px) 0 0 /
+      30px 100%,
+    linear-gradient(180deg, rgb(255 192 74 / 0.7), rgb(255 122 24 / 0.7));
+  animation: pl-fill-stripes 0.5s linear infinite;
+}
+
+[data-theme='pocket'] :is(.mf-btn, .mf-btn-primary) > .mf-fill {
+  transform: skewX(-14deg);
+}
+
+/* The main action is orange already: its gauge burns white-hot instead. */
+[data-theme='pocket'] .mf-btn-primary > .mf-fill {
+  background:
+    repeating-linear-gradient(115deg, rgb(255 255 255 / 0.3) 0 5px, transparent 5px 14px) 0 0 /
+      30px 100%,
+    linear-gradient(180deg, rgb(255 246 214 / 0.55), rgb(255 206 120 / 0.45));
+}
+
+/* The stripes are the motion here; the shared sheen would blur them. */
+[data-theme='pocket'] .mf-fill::after {
+  display: none;
+}
+
+@keyframes pl-fill-stripes {
+  to {
+    background-position: 30px 0, 0 0;
+  }
+}

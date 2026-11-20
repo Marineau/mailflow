@@ -1,0 +1,916 @@
+/*
+ * Classique — after the classic 3D look of Windows 98.
+ *
+ * The reference is Outlook Express 5 on Windows 98: a navy caption fading to
+ * light blue, a grey face, white panes sunk into it, push buttons with a
+ * two-pixel bevel, flat toolbar buttons that rise under the pointer, the
+ * solid navy selection, the dotted focus rectangle and the blocky progress
+ * bar.
+ *
+ * Everything is built from the five colors Windows 98 used for 3D objects:
+ * face, light, highlight, shadow and dark shadow. Light mode is the stock
+ * "Windows Standard" scheme. Windows 98 had no dark mode, so dark mode here
+ * is a charcoal scheme made the way its own color schemes were made: by
+ * changing those five colors and nothing else.
+ *
+ * What the period did not have is switched off: rounded corners, transitions,
+ * drop shadows, hover feedback on push buttons. One concession: list rows and
+ * folders keep a faint hover tint, which a mouse-driven mail list needs.
+ *
+ * Layout of this file: tokens per mode, bevel recipes, then the skin. Every
+ * skin rule is prefixed by [data-theme='win98']; rules for the theme preview
+ * are keyed on the preview element itself.
+ */
+
+/* ------------------------------------------------------------------ tokens */
+
+[data-theme='win98'][data-mode='light'] {
+  /*
+   * The system font was MS Sans Serif, a bitmap font browsers no longer
+   * render. Tahoma shipped with Windows 98 too, is drawn on the same grid,
+   * and has a real bold, which unread messages need.
+   */
+  --font-sans: Tahoma, 'Microsoft Sans Serif', 'MS Sans Serif', Geneva, sans-serif;
+  --color-canvas: #ffffff;
+  --color-surface: #c0c0c0;
+  --color-surface-hover: #e8e8e8;
+  --color-line: #808080;
+  --color-ink: #000000;
+  /* Windows 98 only had "grey text" (#808080), too faint on the grey face. */
+  --color-ink-muted: #404040;
+  --color-accent: #000080;
+  --color-on-accent: #ffffff;
+  --color-warn: #800000;
+  --color-flag: #ff0000;
+
+  --mf-bone: #dfdfdf;
+  --mf-sweep: rgb(255 255 255 / 0.8);
+  --mf-track: #c0c0c0;
+
+  /* The five 3D colors. */
+  --w98-face: #c0c0c0;
+  --w98-light: #dfdfdf;
+  --w98-hilite: #ffffff;
+  --w98-shadow: #808080;
+  --w98-dark: #000000;
+
+  --w98-window: #ffffff;
+  --w98-text: #000000;
+  /* Disabled text: grey, with a highlight one pixel down and right. */
+  --w98-gray-text: #808080;
+  --w98-gray-emboss: #ffffff;
+  --w98-sel: #000080;
+  --w98-sel-text: #ffffff;
+  --w98-sel-mark: #ffff00;
+  --w98-caption: linear-gradient(to right, #000080, #1084d0);
+  --w98-caption-text: #ffffff;
+  --w98-desktop: #008080;
+  --w98-count: #0000ff;
+  --w98-row-edge: #dfdfdf;
+  /* Tooltip colors: the closest thing the period had to an information bar. */
+  --w98-info: #ffffe1;
+  --w98-info-text: #000000;
+  --w98-error: #800000;
+}
+
+[data-theme='win98'][data-mode='dark'] {
+  --font-sans: Tahoma, 'Microsoft Sans Serif', 'MS Sans Serif', Geneva, sans-serif;
+  --color-canvas: #161616;
+  --color-surface: #3b3b3b;
+  --color-surface-hover: #272727;
+  --color-line: #5a5a5a;
+  --color-ink: #e8e8e8;
+  --color-ink-muted: #b4b4b4;
+  --color-accent: #7aa7ff;
+  --color-on-accent: #000000;
+  --color-warn: #ffd24a;
+  --color-flag: #ff6b6b;
+
+  --mf-bone: #2c2c2c;
+  --mf-sweep: rgb(255 255 255 / 0.12);
+  --mf-track: #3b3b3b;
+
+  --w98-face: #3b3b3b;
+  --w98-light: #4d4d4d;
+  --w98-hilite: #6b6b6b;
+  --w98-shadow: #1d1d1d;
+  --w98-dark: #000000;
+
+  --w98-window: #161616;
+  --w98-text: #e8e8e8;
+  --w98-gray-text: #8c8c8c;
+  --w98-gray-emboss: #000000;
+  /* Navy disappears against a near-black window: one step brighter. */
+  --w98-sel: #2450b4;
+  --w98-sel-text: #ffffff;
+  --w98-sel-mark: #ffff7a;
+  --w98-caption: linear-gradient(to right, #000080, #1084d0);
+  --w98-caption-text: #ffffff;
+  --w98-desktop: #003838;
+  --w98-count: #7aa7ff;
+  --w98-row-edge: #2a2a2a;
+  --w98-info: #3d3812;
+  --w98-info-text: #fff3b0;
+  --w98-error: #d04040;
+}
+
+/*
+ * Bevel recipes. Each edge is two one-pixel lines; which of the five colors
+ * goes where is what tells a button from a window from a field.
+ * Declared on the element that carries the theme, so they resolve against
+ * the colors of its mode — in a theme preview as well.
+ */
+[data-theme='win98'] {
+  /* Push button, scrollbar thumb. */
+  --w98-raised:
+    inset -1px -1px var(--w98-dark), inset 1px 1px var(--w98-hilite),
+    inset -2px -2px var(--w98-shadow), inset 2px 2px var(--w98-light);
+  /* The same button held down. */
+  --w98-pressed:
+    inset -1px -1px var(--w98-hilite), inset 1px 1px var(--w98-dark),
+    inset -2px -2px var(--w98-light), inset 2px 2px var(--w98-shadow);
+  /* Default button of a surface: the bevel inside a black frame. */
+  --w98-default:
+    inset -2px -2px var(--w98-dark), inset 1px 1px var(--w98-dark),
+    inset 2px 2px var(--w98-hilite), inset -3px -3px var(--w98-shadow),
+    inset 3px 3px var(--w98-light);
+  --w98-default-pressed: inset 0 0 0 1px var(--w98-dark), inset 0 0 0 2px var(--w98-shadow);
+  /* Window frame: light and highlight swap places. */
+  --w98-frame:
+    inset -1px -1px var(--w98-dark), inset 1px 1px var(--w98-light),
+    inset -2px -2px var(--w98-shadow), inset 2px 2px var(--w98-hilite);
+  /* Text field. */
+  --w98-sunken:
+    inset -1px -1px var(--w98-hilite), inset 1px 1px var(--w98-shadow),
+    inset -2px -2px var(--w98-light), inset 2px 2px var(--w98-dark);
+  /* One-pixel versions: toolbar buttons, progress bar. */
+  --w98-thin-raised: inset 1px 1px var(--w98-hilite), inset -1px -1px var(--w98-shadow);
+  --w98-thin-sunken: inset 1px 1px var(--w98-shadow), inset -1px -1px var(--w98-hilite);
+  /* Checkerboard of face and highlight: scrollbar track, checked button. */
+  --w98-dither: repeating-conic-gradient(var(--w98-face) 0% 25%, var(--w98-hilite) 0% 50%) 0 0 /
+    2px 2px;
+  /*
+   * One flat layer in the text color. A scrollbar button takes neither a mask
+   * nor `currentColor`, so its arrow is stacked from four of these, one per
+   * row of pixels — and follows the text color of the mode by itself.
+   */
+  --w98-ink: linear-gradient(var(--w98-text), var(--w98-text));
+
+  /*
+   * Square corners everywhere, hooked or not: the `rounded-sm`, `-md` and
+   * `-lg` utilities read these. `rounded-full` does not, and bare `rounded`
+   * is not used in the components for that reason.
+   */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+}
+
+/*
+ * The preview of another theme inherits those zeros: its own token block
+ * does not declare radii. These are Tailwind's defaults, given back.
+ */
+[data-theme='win98'] .mf-thumb:not([data-theme='win98']) {
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+}
+
+[data-theme='win98'] .mf-bone {
+  border-radius: 0;
+}
+
+/* ---------------------------------------------------------------- density */
+
+/*
+ * Windows 98 set its whole interface in 8 pt — 11 px at 96 dpi — and packed
+ * it tight. Two kinds of Tailwind token carry that here: the text sizes, and
+ * the spacing unit that every padding, gap and size utility multiplies.
+ * `rem` is left alone, so what is written in rem (the width of a dialog)
+ * keeps its size.
+ *
+ * There was one text size, not a scale: `text-xs` and `text-sm` are the same
+ * 11 px. What told two lines apart was weight and grey text.
+ *
+ * On the root only. A preview of this theme inside another one stays at its
+ * host's scale, and the previews shown under this theme shrink together.
+ */
+:root[data-theme='win98'] {
+  --spacing: 3px;
+  --text-xs: 11px;
+  --text-xs--line-height: calc(14 / 11);
+  --text-sm: 11px;
+  --text-sm--line-height: calc(14 / 11);
+  --text-base: 12px;
+  --text-base--line-height: calc(16 / 12);
+}
+
+/* Text that names no size. */
+:root[data-theme='win98'] body {
+  font-size: 11px;
+}
+
+/*
+ * Icons keep their size: they were 16 px beside 11 px text. The unit is given
+ * back on the icon itself, where its own size utility reads it.
+ */
+:root[data-theme='win98'] .mf-icon {
+  --spacing: 0.25rem;
+}
+
+/* The search field leaves room for its icon in spacing units; the icon did not shrink. */
+:root[data-theme='win98'] .mf-titlebar .mf-input {
+  padding-left: 30px;
+}
+
+/* A quarter narrower would cut most folder names; Outlook Express gave them about this. */
+:root[data-theme='win98'] .mf-nav {
+  width: 208px;
+}
+
+/* ----------------------------------------------------- desktop and caption */
+
+[data-theme='win98'] body {
+  background: var(--w98-desktop);
+}
+
+[data-theme='win98'] ::selection {
+  background: var(--w98-sel);
+  color: var(--w98-sel-text);
+}
+
+[data-theme='win98'] .mf-app {
+  background: var(--w98-face);
+}
+
+/* The consent and error screens: one window alone on the desktop. */
+[data-theme='win98'] .mf-stage {
+  background: transparent;
+}
+
+/*
+ * The caption of a maximized window. The app's top bar is a toolbar, so the
+ * skin shows the caption element `App` keeps hidden above it, and retires the
+ * brand that sat in the toolbar. No caption buttons: they would do nothing.
+ */
+[data-theme='win98'] .mf-caption {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 22px;
+  padding: 0 6px 0 27px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff' stroke='%23000' d='M1.5 3.5h13v9h-13z'/%3E%3Cpath fill='none' stroke='%23000' d='M1.5 3.5l6.5 5 6.5-5'/%3E%3C/svg%3E")
+      6px center / 16px 16px no-repeat,
+    var(--w98-caption);
+  color: var(--w98-caption-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+[data-theme='win98'] .mf-brand {
+  display: none;
+}
+
+/* The toolbar. Its bottom edge is etched: a shadow line over a highlight. */
+[data-theme='win98'] .mf-titlebar {
+  background: var(--w98-face);
+  border-bottom-color: var(--w98-hilite);
+  box-shadow: inset 0 -1px 0 var(--w98-shadow);
+}
+
+[data-theme='win98'] .mf-titlebar-rule {
+  border-left-color: var(--w98-shadow);
+  box-shadow: inset 1px 0 0 var(--w98-hilite);
+}
+
+/* -------------------------------------------------------------- buttons */
+
+[data-theme='win98'] .mf-btn,
+[data-theme='win98'] .mf-btn-primary {
+  border: 0;
+  border-radius: 0;
+  background: var(--w98-face);
+  color: var(--w98-text);
+  font-weight: 400;
+  opacity: 1;
+  box-shadow: var(--w98-raised);
+  transition: none;
+}
+
+[data-theme='win98'] .mf-btn-primary {
+  box-shadow: var(--w98-default);
+}
+
+[data-theme='win98'] .mf-btn:active:not(:disabled) {
+  box-shadow: var(--w98-pressed);
+}
+
+[data-theme='win98'] .mf-btn-primary:active:not(:disabled) {
+  box-shadow: var(--w98-default-pressed);
+}
+
+[data-theme='win98'] .mf-btn:focus-visible,
+[data-theme='win98'] .mf-btn-primary:focus-visible {
+  outline: 1px dotted var(--w98-text);
+  outline-offset: -5px;
+}
+
+[data-theme='win98'] .mf-btn:disabled,
+[data-theme='win98'] .mf-btn-primary:disabled,
+[data-theme='win98'] .mf-icon-btn:disabled {
+  color: var(--w98-gray-text);
+  opacity: 1;
+  text-shadow: 1px 1px 0 var(--w98-gray-emboss);
+  --color-ink-muted: var(--w98-gray-text);
+}
+
+/* Toolbar buttons are flat; the bevel appears under the pointer. */
+[data-theme='win98'] .mf-icon-btn {
+  border-radius: 0;
+  color: var(--w98-text);
+  transition: none;
+}
+
+[data-theme='win98'] .mf-icon-btn:hover:not(:disabled) {
+  background: none;
+  box-shadow: var(--w98-thin-raised);
+}
+
+[data-theme='win98'] .mf-icon-btn:active:not(:disabled),
+[data-theme='win98'] .mf-icon-btn[aria-pressed='true'] {
+  box-shadow: var(--w98-thin-sunken);
+}
+
+/* A toggle that is on stays down, on the checkerboard. */
+[data-theme='win98'] .mf-icon-btn[aria-pressed='true'] {
+  background: var(--w98-dither);
+}
+
+[data-theme='win98'] .mf-icon-btn:focus-visible {
+  outline: 1px dotted var(--w98-text);
+  outline-offset: -3px;
+}
+
+/* ---------------------------------------------------------------- fields */
+
+[data-theme='win98'] .mf-input,
+[data-theme='win98'] .mf-select,
+[data-theme='win98'] .mf-field {
+  border: 0;
+  border-radius: 0;
+  background: var(--w98-window);
+  color: var(--w98-text);
+  box-shadow: var(--w98-sunken);
+}
+
+/* In black, a hint in a white field reads as something already typed. */
+[data-theme='win98'] .mf-input::placeholder,
+[data-theme='win98'] .mf-field::placeholder {
+  color: var(--w98-gray-text);
+}
+
+/* Composer fields: a label on the face, a white field sunk beside it. */
+[data-theme='win98'] .mf-field {
+  margin: 3px 0;
+  padding: 4px 6px;
+}
+
+[data-theme='win98'] .mf-field-row {
+  border-bottom-color: transparent;
+}
+
+/* ----------------------------------------------------------------- panes */
+
+[data-theme='win98'] .mf-workspace {
+  gap: 4px;
+  padding: 3px;
+  background: var(--w98-face);
+}
+
+/*
+ * A pane is a white well in the face. The inner pair of lines is a real
+ * border, so rows and the scrollbar stay inside it; the outer pair is drawn
+ * in the gap around the pane.
+ */
+[data-theme='win98'] .mf-nav,
+[data-theme='win98'] .mf-list,
+[data-theme='win98'] .mf-reader,
+[data-theme='win98'] .mf-editor {
+  border: 1px solid;
+  border-color: var(--w98-dark) var(--w98-light) var(--w98-light) var(--w98-dark);
+  box-shadow:
+    -1px -1px 0 var(--w98-shadow),
+    1px 1px 0 var(--w98-hilite);
+}
+
+[data-theme='win98'] .mf-nav,
+[data-theme='win98'] .mf-list,
+[data-theme='win98'] .mf-reader {
+  background: var(--w98-window);
+}
+
+[data-theme='win98'] .mf-editor {
+  margin: 2px 1px 1px;
+}
+
+/*
+ * The list and the reading pane are no longer direct siblings of the
+ * workspace, so the 4 px face gap between them has to be the splitter
+ * itself. Everywhere else the bar is zero-wide and only its hit target
+ * shows; here that target sits in this strip, and the pane shadows stay
+ * visible through it.
+ */
+[data-theme='win98'] .mf-split {
+  width: 4px;
+}
+
+/* ------------------------------------------------------- navigation pane */
+
+[data-theme='win98'] .mf-nav-item {
+  border-radius: 0;
+  background: none;
+  color: var(--w98-text);
+  transition: none;
+}
+
+[data-theme='win98'] .mf-nav-item:hover {
+  background: var(--color-surface-hover);
+}
+
+[data-theme='win98'] .mf-nav-item[aria-current] {
+  background: var(--w98-sel);
+  color: var(--w98-sel-text);
+  --color-ink-muted: var(--w98-sel-text);
+}
+
+[data-theme='win98'] .mf-nav-item:focus-visible,
+[data-theme='win98'] .mf-row:focus-visible,
+[data-theme='win98'] .mf-theme-card:focus-visible {
+  outline: 1px dotted currentColor;
+  outline-offset: -2px;
+}
+
+/* Outlook Express: a folder with unread mail is bold, its count blue. */
+[data-theme='win98'] .mf-nav-item:has(.mf-badge) {
+  font-weight: 700;
+}
+
+[data-theme='win98'] .mf-badge {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--w98-count);
+  font-weight: 700;
+}
+
+[data-theme='win98'] .mf-nav-item[aria-current] .mf-badge {
+  color: var(--w98-sel-text);
+}
+
+[data-theme='win98'] .mf-badge::before {
+  content: '(';
+}
+
+[data-theme='win98'] .mf-badge::after {
+  content: ')';
+}
+
+/* ---------------------------------------------------------- message list */
+
+[data-theme='win98'] .mf-row {
+  border-bottom-color: var(--w98-row-edge);
+  transition: none;
+}
+
+/* Everything in a selected row turns to the selection's text color. */
+[data-theme='win98'] .mf-row[aria-current],
+[data-theme='win98'] .mf-option[aria-selected='true'],
+[data-theme='win98'] .mf-theme-card[aria-checked='true'] {
+  background: var(--w98-sel);
+  color: var(--w98-sel-text);
+  --color-ink: var(--w98-sel-text);
+  --color-ink-muted: var(--w98-sel-text);
+  --color-accent: var(--w98-sel-text);
+  --color-warn: var(--w98-sel-mark);
+  --color-flag: var(--w98-sel-mark);
+}
+
+[data-theme='win98'] .mf-unread-dot {
+  border-radius: 0;
+}
+
+/* ---------------------------------------------------------- reading pane */
+
+/* The preview pane header was a grey band over the white message. */
+[data-theme='win98'] .mf-reader-head,
+[data-theme='win98'] .mf-toolbar {
+  background: var(--w98-face);
+  border-bottom-color: var(--w98-hilite);
+  box-shadow: inset 0 -1px 0 var(--w98-shadow);
+}
+
+/* No pictures of people in 1998: a tile in the color of the desktop. */
+[data-theme='win98'] .mf-avatar {
+  border-radius: 0;
+  background: #008080;
+  color: #ffffff;
+  box-shadow: var(--w98-thin-sunken);
+}
+
+[data-theme='win98'] .mf-infobar {
+  background: var(--w98-info);
+  border-bottom-color: var(--w98-dark);
+  color: var(--w98-info-text);
+  --color-ink-muted: var(--w98-info-text);
+}
+
+/* --------------------------------------------------- windows and popups */
+
+[data-theme='win98'] .mf-window {
+  padding: 3px;
+  border: 0;
+  border-radius: 0;
+  background: var(--w98-face);
+  color: var(--w98-text);
+  box-shadow: var(--w98-frame);
+}
+
+/* A modal dialog did not dim what was behind it. */
+[data-theme='win98'] .mf-window::backdrop {
+  background: transparent;
+}
+
+[data-theme='win98'] .mf-window[data-dragging] {
+  outline: 2px dotted var(--w98-text);
+  outline-offset: 2px;
+}
+
+[data-theme='win98'] .mf-window-title {
+  flex-shrink: 0;
+  min-height: 20px;
+  margin-bottom: 1px;
+  padding: 2px 2px 2px 4px;
+  border-bottom: 0;
+  background: var(--w98-caption);
+  color: var(--w98-caption-text);
+  --color-ink-muted: var(--w98-caption-text);
+}
+
+[data-theme='win98'] .mf-window-title > :first-child {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/*
+ * Caption buttons: small push buttons, a heavy black cross for close, a
+ * bar sitting on the bottom edge for minimize. Two pixels between them, as
+ * the minimize button sat flush against maximize, and close stood apart.
+ */
+[data-theme='win98'] .mf-window-close,
+[data-theme='win98'] .mf-window-close:hover,
+[data-theme='win98'] .mf-window-min,
+[data-theme='win98'] .mf-window-min:hover {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 14px;
+  padding: 0;
+  border-radius: 0;
+  background: var(--w98-face);
+  color: var(--w98-text);
+  box-shadow: var(--w98-raised);
+}
+
+[data-theme='win98'] .mf-window-close:active,
+[data-theme='win98'] .mf-window-min:active {
+  box-shadow: var(--w98-pressed);
+}
+
+[data-theme='win98'] .mf-window-close svg,
+[data-theme='win98'] .mf-window-min svg {
+  width: 10px;
+  height: 10px;
+  stroke-width: 3.5;
+  stroke-linecap: square;
+}
+
+[data-theme='win98'] .mf-window-min svg {
+  transform: translateY(3px);
+}
+
+[data-theme='win98'] .mf-window-min + .mf-window-close {
+  margin-left: -1px;
+}
+
+/* -------------------------------------------------------------- taskbar */
+
+/*
+ * The Windows 98 taskbar: a face-coloured strip with a light rim on top,
+ * buttons 160 pixels wide, icon and caption left-aligned. A minimized window
+ * is a raised button; pressing it shows it sunk until it is released.
+ */
+[data-theme='win98'] .mf-app[data-taskbar] {
+  --mf-taskbar-h: 28px;
+}
+
+[data-theme='win98'] .mf-taskbar {
+  height: 28px;
+  gap: 3px;
+  padding: 4px 2px 2px;
+  border-top: 0;
+  background: var(--w98-face);
+  box-shadow:
+    inset 0 1px var(--w98-light),
+    inset 0 2px var(--w98-hilite);
+}
+
+[data-theme='win98'] .mf-taskbar-item {
+  width: 160px;
+  height: 22px;
+  gap: 3px;
+  padding: 0 4px;
+  font-size: 11px;
+}
+
+[data-theme='win98'] .mf-taskbar-item .mf-icon {
+  width: 16px;
+  height: 16px;
+}
+
+[data-theme='win98'] .mf-window-foot {
+  border-top-color: var(--w98-shadow);
+  box-shadow: inset 0 1px 0 var(--w98-hilite);
+}
+
+/*
+ * Menus and floating panels: the window frame, drawn with a border so the
+ * padding each panel asks for is left alone.
+ */
+[data-theme='win98'] .mf-popover,
+[data-theme='win98'] .mf-toast {
+  border: 1px solid;
+  border-color: var(--w98-hilite) var(--w98-shadow) var(--w98-shadow) var(--w98-hilite);
+  border-radius: 0;
+  background: var(--w98-face);
+  box-shadow:
+    -1px -1px 0 var(--w98-light),
+    1px 1px 0 var(--w98-dark);
+}
+
+/* `rounded-full` is a fixed value, not one of the radius tokens zeroed above. */
+[data-theme='win98'] .mf-toast-icon {
+  border-radius: 0;
+}
+
+[data-theme='win98'] .mf-option:hover {
+  background: var(--w98-sel);
+  color: var(--w98-sel-text);
+  --color-ink-muted: var(--w98-sel-text);
+}
+
+[data-theme='win98'] .mf-theme-card {
+  border-color: transparent;
+  border-radius: 0;
+  transition: none;
+}
+
+/* -------------------------------------------------------------- progress */
+
+/* A shallow well, and blocks that fill it one at a time. */
+[data-theme='win98'] .mf-progress {
+  height: 16px;
+  padding: 3px;
+  border-radius: 0;
+  background: var(--w98-face);
+  box-shadow: var(--w98-thin-sunken);
+}
+
+[data-theme='win98'] .mf-toast .mf-progress {
+  margin: 4px 4px 0;
+}
+
+[data-theme='win98'] .mf-progress-fill {
+  background: repeating-linear-gradient(to right, var(--w98-sel) 0 8px, transparent 8px 10px);
+  transition: none;
+}
+
+[data-theme='win98'] .mf-progress-fill[data-state='error'] {
+  background: repeating-linear-gradient(to right, var(--w98-error) 0 8px, transparent 8px 10px);
+}
+
+[data-theme='win98'] .mf-indet-track {
+  height: 4px;
+}
+
+[data-theme='win98'] .mf-indet-bar {
+  background: var(--w98-sel);
+}
+
+/* ------------------------------------------------------------ scrollbars */
+
+/*
+ * Only where the engine can draw them. Elsewhere the thin token-colored
+ * scrollbars from index.css stay.
+ */
+@supports selector(::-webkit-scrollbar) {
+  [data-theme='win98'],
+  [data-theme='win98'] * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-track {
+    background: var(--w98-dither);
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-corner {
+    background: var(--w98-face);
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-thumb {
+    background: var(--w98-face);
+    box-shadow: var(--w98-raised);
+  }
+
+  /* One arrow at each end; the engine would otherwise offer a pair. */
+  [data-theme='win98'] ::-webkit-scrollbar-button:start:increment,
+  [data-theme='win98'] ::-webkit-scrollbar-button:end:decrement {
+    display: none;
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-button:start:decrement,
+  [data-theme='win98'] ::-webkit-scrollbar-button:end:increment {
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-color: var(--w98-face);
+    /* The arrow: four bars of 1, 3, 5 and 7 pixels, tip first. */
+    background-image: var(--w98-ink), var(--w98-ink), var(--w98-ink), var(--w98-ink);
+    background-repeat: no-repeat;
+    box-shadow: var(--w98-raised);
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-button:start:decrement:active,
+  [data-theme='win98'] ::-webkit-scrollbar-button:end:increment:active {
+    box-shadow: var(--w98-pressed);
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-button:vertical {
+    background-size:
+      1px 1px,
+      3px 1px,
+      5px 1px,
+      7px 1px;
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-button:horizontal {
+    background-size:
+      1px 1px,
+      1px 3px,
+      1px 5px,
+      1px 7px;
+  }
+
+  /* Where each bar sits in the 16 × 16 button. */
+  [data-theme='win98'] ::-webkit-scrollbar-button:vertical:start:decrement {
+    background-position:
+      7px 6px,
+      6px 7px,
+      5px 8px,
+      4px 9px;
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-button:vertical:end:increment {
+    background-position:
+      7px 9px,
+      6px 8px,
+      5px 7px,
+      4px 6px;
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-button:horizontal:start:decrement {
+    background-position:
+      6px 7px,
+      7px 6px,
+      8px 5px,
+      9px 4px;
+  }
+
+  [data-theme='win98'] ::-webkit-scrollbar-button:horizontal:end:increment {
+    background-position:
+      9px 7px,
+      8px 6px,
+      7px 5px,
+      6px 4px;
+  }
+}
+
+/* --------------------------------------------------------- theme preview */
+
+.mf-thumb[data-theme='win98'] {
+  border-radius: 0;
+  background: var(--w98-face);
+}
+
+/* The caption. */
+.mf-thumb[data-theme='win98']::before {
+  content: '';
+  flex-shrink: 0;
+  height: 7px;
+  background: var(--w98-caption);
+}
+
+.mf-thumb[data-theme='win98'] .mf-thumb-bar {
+  height: 1.25rem;
+  background: var(--w98-face);
+  border-bottom-color: var(--w98-shadow);
+}
+
+.mf-thumb[data-theme='win98'] .mf-thumb-brand {
+  display: none;
+}
+
+.mf-thumb[data-theme='win98'] .mf-thumb-field {
+  border-radius: 0;
+  background: var(--w98-window);
+  box-shadow: var(--w98-thin-sunken);
+}
+
+.mf-thumb[data-theme='win98'] .mf-thumb-cta {
+  border-radius: 0;
+  background: var(--w98-face);
+  box-shadow:
+    inset -1px -1px var(--w98-dark),
+    inset 1px 1px var(--w98-hilite);
+}
+
+.mf-thumb[data-theme='win98'] .mf-thumb-panes {
+  gap: 2px;
+  padding: 2px;
+  background: var(--w98-face);
+}
+
+.mf-thumb[data-theme='win98'] .mf-thumb-nav,
+.mf-thumb[data-theme='win98'] .mf-thumb-list,
+.mf-thumb[data-theme='win98'] .mf-thumb-reader {
+  border: 0;
+  background: var(--w98-window);
+  box-shadow: var(--w98-thin-sunken);
+}
+
+.mf-thumb[data-theme='win98'] .mf-thumb-sel {
+  border-radius: 0;
+  background: var(--w98-sel);
+  --color-ink: var(--w98-sel-text);
+  --color-ink-muted: var(--w98-sel-text);
+}
+
+.mf-thumb[data-theme='win98'] .mf-thumb-head {
+  background: var(--w98-face);
+  border-bottom-color: var(--w98-shadow);
+}
+
+/* -------------------------------------------- button fill: block segments */
+
+/*
+ * A button fills with the progress blocks of Windows 98, inside its bevel,
+ * one whole block at a time. Paler than the real bar's navy: the label has
+ * to stay readable on top of them.
+ */
+[data-theme='win98'] .mf-fill {
+  inset: 4px auto 4px 4px;
+  width: calc(var(--mf-fill, 0) * (100% - 8px));
+  width: round(down, calc(var(--mf-fill, 0) * (100% - 8px)), 10px);
+  border-radius: 0;
+  clip-path: none;
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--w98-sel) 34%, transparent) 0 8px,
+    transparent 8px 10px
+  );
+  transition: none;
+}
+
+[data-theme='win98'] .mf-fill::after {
+  display: none;
+}
+
+/* Windows 98 had no fades: the blocks go at once. */
+[data-theme='win98'] .mf-fill[data-state='done'] {
+  visibility: hidden;
+}
+
+/* A button working is not greyed out like an unavailable one. */
+[data-theme='win98'] :is(.mf-btn, .mf-btn-primary, .mf-icon-btn):disabled[aria-busy='true'] {
+  color: var(--w98-text);
+  text-shadow: none;
+  --color-ink-muted: var(--w98-text);
+}

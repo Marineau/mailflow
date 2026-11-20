@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Round 2 of .github/workflows/release.yml: the NSIS installer, built
+     around the program signed in round 1.
+     Paste into SignPath as the artifact configuration with slug `installer`. -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file path="mailFlow-Setup-*.exe" product-name="mailFlow">
+      <authenticode-sign/>
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

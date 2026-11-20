@@ -1,0 +1,36 @@
+{
+  "name": "server",
+  "private": true,
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "tsx src/index.ts",
+    "test:connection": "tsx src/scripts/test-connection.ts",
+    "diagnose": "tsx src/scripts/diagnose-index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "imapflow": "^1.0.191",
+    "mailparser": "^3.7.2",
+    "nodemailer": "^10.6.1",
+    "sanitize-html": "^2.14.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/mailparser": "^3.4.5",
+    "@types/node": "^22.13.1",
+    "@types/sanitize-html": "^2.13.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

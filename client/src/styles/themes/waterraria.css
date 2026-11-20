@@ -1,0 +1,558 @@
+/*
+ * Récif — a pixel-art ocean.
+ *
+ * Translucent blue slots with a dark outline and stepped pixel corners,
+ * white type outlined in black, gold for what is selected or hovered, a
+ * pixel font for every caption. The sea supplies the scenery: a pixel-art
+ * seabed picture behind everything (`waterraria-art/`, generated in Firefly
+ * from the prompts in docs/theme-assets.md), a foam line under the top bar,
+ * bubbles drifting over the water. The font is Pixelify Sans (OFL, shipped
+ * in assets/fonts); the foam and bubbles are drawn below.
+ *
+ * Dark mode is the abyss: deep water, light shafts from above. Light mode is
+ * the shallows under a bright sky. The slots stay blue in both, so their
+ * white outlined captions read the same everywhere.
+ *
+ * Layout of this file: font, tokens per mode, the pixel art, then the skin.
+ * Every skin rule is prefixed by [data-theme='waterraria']; rules for the
+ * theme preview are keyed on the preview element itself.
+ */
+
+@font-face {
+  font-family: 'Pixelify Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../../assets/fonts/PixelifySans.woff2') format('woff2');
+}
+
+/* ------------------------------------------------------------------ tokens */
+
+[data-theme='waterraria'][data-mode='dark'] {
+  --font-sans: 'Segoe UI', Tahoma, sans-serif;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+
+  --color-canvas: #041a36;
+  --color-surface: #13285c;
+  --color-surface-hover: #1d3a7a;
+  --color-line: #0b1a45;
+  --color-ink: #f4f9ff;
+  --color-ink-muted: #a8c2ea;
+  /* The gold of a selected slot. */
+  --color-accent: #ffd23f;
+  --color-on-accent: #2a1a00;
+  --color-warn: #ff8a7a;
+  --color-flag: #ffd23f;
+
+  --mf-bone: #1a3168;
+  --mf-sweep: rgb(127 224 255 / 0.18);
+  --mf-track: #0b1a45;
+
+  --wr-scene: url('./waterraria-art/ocean-abyss.webp');
+  --wr-water: #071a2e;
+  --wr-panel: rgb(3 20 46 / 0.88);
+  --wr-head: rgb(63 82 151 / 0.42);
+  --wr-row: #1d3a7a;
+  --wr-row-hover: rgb(63 82 151 / 0.32);
+  --wr-row-edge: #ffd23f;
+  --wr-field: rgb(2 14 36 / 0.75);
+  --wr-field-edge: #0b1a45;
+  --wr-bar: linear-gradient(180deg, #0d5596, #083a70);
+  --wr-bar-ink: #f4f9ff;
+  --wr-bar-muted: #b6d6f5;
+}
+
+[data-theme='waterraria'][data-mode='light'] {
+  --font-sans: 'Segoe UI', Tahoma, sans-serif;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+
+  --color-canvas: #c9f0ff;
+  --color-surface: #eefaff;
+  --color-surface-hover: #d6f2ff;
+  --color-line: #2a5aa8;
+  --color-ink: #0b2346;
+  --color-ink-muted: #3f5f86;
+  /* Deep lagoon: white type on it clears, and it reads as text on white. */
+  --color-accent: #00718f;
+  --color-on-accent: #ffffff;
+  --color-warn: #b4231a;
+  --color-flag: #d99a00;
+
+  --mf-bone: #c2e6f6;
+  --mf-sweep: rgb(255 255 255 / 0.7);
+  --mf-track: #c2e6f6;
+
+  --wr-scene: url('./waterraria-art/ocean-shallows.webp');
+  --wr-water: #5fdcd8;
+  --wr-panel: rgb(244 252 255 / 0.93);
+  --wr-head: #d8f2ff;
+  --wr-row: #fff1bd;
+  --wr-row-hover: rgb(0 113 143 / 0.08);
+  --wr-row-edge: #c98b00;
+  --wr-field: #ffffff;
+  --wr-field-edge: #2a5aa8;
+  --wr-bar: linear-gradient(180deg, #a6e6ff, #6fcdf2);
+  --wr-bar-ink: #0b2346;
+  --wr-bar-muted: #22507e;
+}
+
+/* Shared by both modes: the inventory slot, the outline, the pixel corner. */
+[data-theme='waterraria'] {
+  --wr-pixel: 'Pixelify Sans', 'Segoe UI', sans-serif;
+  --wr-slot: rgb(54 76 158 / 0.92);
+  --wr-slot-hover: rgb(70 96 186 / 0.95);
+  --wr-slot-edge: #0a1338;
+  --wr-gold: #ffd23f;
+  --wr-gold-soft: #ffe680;
+  --wr-outline:
+    1px 0 0 #050a1e, -1px 0 0 #050a1e, 0 1px 0 #050a1e, 0 -1px 0 #050a1e,
+    1px 1px 0 #050a1e, -1px 1px 0 #050a1e, 1px -1px 0 #050a1e, -1px -1px 0 #050a1e;
+  /* Stepped corners, two pixels per step. */
+  --wr-corners: polygon(
+    0 4px, 2px 4px, 2px 2px, 4px 2px, 4px 0,
+    calc(100% - 4px) 0, calc(100% - 4px) 2px, calc(100% - 2px) 2px, calc(100% - 2px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 2px) calc(100% - 4px), calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 2px), 2px calc(100% - 2px), 2px calc(100% - 4px), 0 calc(100% - 4px)
+  );
+
+  /* ------------------------------------------------------- pixel art */
+
+  /* Foam on the wave crest, tiled under the top bar. */
+  --wr-foam: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='4' shape-rendering='crispEdges'><path fill='%237fd6ff' d='M0 3h16v1H0zM3 2h10v1H3zM7 1h3v1H7z'/><path fill='%23ffffff' d='M0 2h3v1H0zM3 1h4v1H3zM7 0h3v1H7zM10 1h3v1h-3zM13 2h3v1h-3z'/></svg>");
+
+  /* Rising bubbles, two sizes, scattered on one tile. */
+  --wr-bubbles: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='130' shape-rendering='crispEdges'><defs><path id='b' d='M2 0h2v1H2zM1 1h1v1H1zM4 1h1v1H4zM0 2h1v2H0zM5 2h1v2H5zM1 4h1v1H1zM4 4h1v1H4zM2 5h2v1H2z'/><path id='s' d='M1 0h2v1H1zM0 1h1v2H0zM3 1h1v2H3zM1 3h2v1H1z'/></defs><g fill='%23cdefff' fill-opacity='.34'><use href='%23b' x='12' y='96'/><use href='%23s' x='17' y='80'/><use href='%23s' x='14' y='66'/><use href='%23b' x='64' y='38'/><use href='%23s' x='70' y='22'/><use href='%23s' x='66' y='9'/><use href='%23s' x='40' y='118'/><use href='%23b' x='44' y='70'/></g><g fill='%23ffffff' fill-opacity='.45'><path d='M14 98h1v1h-1zM66 40h1v1h-1zM46 72h1v1h-1z'/></g></svg>");
+
+}
+
+/* ---------------------------------------------------------- the water */
+
+[data-theme='waterraria'] ::selection {
+  background: var(--wr-gold);
+  color: #2a1a00;
+}
+
+[data-theme='waterraria'] * {
+  scrollbar-color: var(--wr-slot) transparent;
+}
+
+/*
+ * Bubbles over the seabed picture. Anchored to the bottom so the sand and
+ * coral stay in view whatever the window's proportions.
+ */
+[data-theme='waterraria'] .mf-app,
+[data-theme='waterraria'] .mf-stage {
+  background:
+    var(--wr-bubbles) 0 0 / 180px 260px repeat,
+    var(--wr-scene) center bottom / cover no-repeat,
+    var(--wr-water);
+}
+
+/* The surface: sky-lit water with the foam line along its foot. */
+[data-theme='waterraria'] .mf-titlebar {
+  border-bottom-color: transparent;
+  color: var(--wr-bar-ink);
+  background:
+    var(--wr-foam) left bottom / 32px 8px repeat-x,
+    var(--wr-bar);
+  padding-bottom: 6px;
+}
+
+[data-theme='waterraria'] .mf-titlebar .mf-icon-btn {
+  color: var(--wr-bar-muted);
+}
+
+[data-theme='waterraria'] .mf-titlebar .mf-icon-btn:hover {
+  color: var(--wr-gold-soft);
+  background: var(--wr-slot);
+}
+
+[data-theme='waterraria'] .mf-titlebar-rule {
+  border-color: var(--wr-slot-edge);
+  border-left-width: 2px;
+}
+
+[data-theme='waterraria'] .mf-brand {
+  color: #ffffff;
+  font-family: var(--wr-pixel);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow:
+    var(--wr-outline),
+    3px 3px 0 #0a3f78;
+}
+
+/* Lucide strokes, squared off and drawn without anti-aliasing. */
+[data-theme='waterraria'] .mf-icon {
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  shape-rendering: crispEdges;
+}
+
+/* ------------------------------------------------------------- buttons */
+
+[data-theme='waterraria'] .mf-btn,
+[data-theme='waterraria'] .mf-btn-primary,
+[data-theme='waterraria'] .mf-nav-item,
+[data-theme='waterraria'] .mf-avatar,
+[data-theme='waterraria'] .mf-window,
+[data-theme='waterraria'] .mf-toast,
+[data-theme='waterraria'] .mf-popover {
+  clip-path: var(--wr-corners);
+}
+
+/* The clip would cut a focus ring drawn outside: draw it inside. */
+[data-theme='waterraria'] :is(.mf-btn, .mf-btn-primary, .mf-nav-item):focus-visible {
+  outline: 2px solid var(--wr-gold);
+  outline-offset: -4px;
+}
+
+/* A plain button is an inventory slot. */
+[data-theme='waterraria'] .mf-btn {
+  border: 2px solid var(--wr-slot-edge);
+  background: var(--wr-slot);
+  color: #ffffff;
+  font-family: var(--wr-pixel);
+  text-shadow: var(--wr-outline);
+  --color-ink: #ffffff;
+  --color-ink-muted: #d6e4ff;
+}
+
+[data-theme='waterraria'] .mf-btn:hover:not(:disabled) {
+  background: var(--wr-slot-hover);
+  color: var(--wr-gold-soft);
+}
+
+/* The main action is the gold of a treasure chest, in both modes. */
+[data-theme='waterraria'] .mf-btn-primary {
+  border: 2px solid #6b3f0a;
+  background: linear-gradient(180deg, #ffe58a 0 45%, #f5bd36 45% 100%);
+  color: #3a2200;
+  font-family: var(--wr-pixel);
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.45);
+  box-shadow: inset 0 -3px 0 #c98b00;
+}
+
+[data-theme='waterraria'] .mf-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.07);
+  opacity: 1;
+}
+
+[data-theme='waterraria'] .mf-icon-btn:hover:not(:disabled) {
+  background: var(--wr-row-hover);
+  color: var(--color-ink);
+}
+
+/* -------------------------------------------------------------- fields */
+
+[data-theme='waterraria'] .mf-input,
+[data-theme='waterraria'] .mf-select {
+  border: 2px solid var(--wr-field-edge);
+  background: var(--wr-field);
+}
+
+[data-theme='waterraria'][data-mode='dark'] .mf-titlebar .mf-input {
+  border-color: var(--wr-slot-edge);
+  background: rgb(2 14 36 / 0.55);
+  color: #f4f9ff;
+}
+
+[data-theme='waterraria'][data-mode='dark'] .mf-titlebar .mf-input::placeholder {
+  color: #b6d6f5;
+}
+
+[data-theme='waterraria'] .mf-input:focus,
+[data-theme='waterraria'] .mf-titlebar .mf-input:focus {
+  border-color: var(--wr-gold);
+}
+
+/* ------------------------------------------------ folder pane: the slots */
+
+/* Room at the bottom: the sand and coral of the picture stay in view. */
+[data-theme='waterraria'] .mf-nav {
+  border-right: 2px solid var(--wr-slot-edge);
+  padding-bottom: 5rem;
+}
+
+/* Over the coral and sand, the pane's loose text gets the caption outline. */
+[data-theme='waterraria'][data-mode='dark'] .mf-nav {
+  text-shadow: var(--wr-outline);
+}
+
+/* The shallows' coral climbs higher: frost it, and halo the dark text. */
+[data-theme='waterraria'][data-mode='light'] .mf-nav {
+  background: linear-gradient(180deg, transparent 35%, rgb(240 251 255 / 0.62) 60%);
+  text-shadow:
+    0 0 2px #ffffff,
+    0 0 4px #ffffff;
+}
+
+[data-theme='waterraria'] .mf-nav-item {
+  margin-block: 1px;
+  border: 2px solid var(--wr-slot-edge);
+  background: var(--wr-slot);
+  color: #ffffff;
+  font-family: var(--wr-pixel);
+  text-shadow: var(--wr-outline);
+  --color-ink: #ffffff;
+  --color-ink-muted: #d6e4ff;
+}
+
+[data-theme='waterraria'] .mf-nav-item:hover:not([aria-current]) {
+  background: var(--wr-slot-hover);
+  color: var(--wr-gold-soft);
+}
+
+/* Selected slot: gold frame, brighter fill. */
+[data-theme='waterraria'] .mf-nav-item[aria-current] {
+  border-color: var(--wr-gold);
+  background: rgb(84 110 204 / 0.96);
+  color: var(--wr-gold-soft);
+  font-weight: 600;
+}
+
+/* Stack count: outlined gold digits, no plate. */
+[data-theme='waterraria'] .mf-badge {
+  border-radius: 0;
+  background: transparent;
+  color: var(--wr-gold-soft);
+  font-family: var(--wr-pixel);
+  font-weight: 700;
+  text-shadow: var(--wr-outline);
+}
+
+/* Breath meter. */
+[data-theme='waterraria'] .mf-progress {
+  height: 6px;
+  border-radius: 0;
+  background: var(--wr-slot-edge);
+  box-shadow: 0 0 0 1px var(--wr-slot-edge);
+}
+
+[data-theme='waterraria'] .mf-progress-fill {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, #8ae6ff 0 6px, #2a9fd6 6px 8px);
+}
+
+/* ------------------------------------------- list and reader: the panels */
+
+[data-theme='waterraria'] .mf-list,
+[data-theme='waterraria'] .mf-reader {
+  background: var(--wr-panel);
+}
+
+[data-theme='waterraria'] .mf-list {
+  border-right: 2px solid var(--wr-slot-edge);
+}
+
+[data-theme='waterraria'] .mf-row {
+  border-bottom-color: color-mix(in srgb, var(--color-line) 55%, transparent);
+}
+
+[data-theme='waterraria'] .mf-row:hover:not([aria-current]) {
+  background: var(--wr-row-hover);
+}
+
+[data-theme='waterraria'] .mf-row[aria-current] {
+  background: var(--wr-row);
+  box-shadow: inset 0 0 0 2px var(--wr-row-edge);
+}
+
+/* A square pixel, not a dot. */
+[data-theme='waterraria'] .mf-unread-dot {
+  border-radius: 0;
+}
+
+[data-theme='waterraria'] .mf-reader-head {
+  background: var(--wr-head);
+  border-bottom: 2px solid var(--color-line);
+}
+
+[data-theme='waterraria'] .mf-heading {
+  font-family: var(--wr-pixel);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+[data-theme='waterraria'] .mf-avatar {
+  border: 2px solid var(--wr-gold);
+  background: var(--wr-slot);
+  color: #ffffff;
+  font-family: var(--wr-pixel);
+  text-shadow: var(--wr-outline);
+}
+
+/* The remote-content warning: a sand plaque, in both modes. */
+[data-theme='waterraria'] .mf-infobar {
+  background: #f1dc9c;
+  color: #4a3410;
+  border-bottom: 2px solid #b8913f;
+  --color-ink: #4a3410;
+  --color-ink-muted: #6e5320;
+}
+
+/* ------------------------------------------------------------- windows */
+
+[data-theme='waterraria'] .mf-window,
+[data-theme='waterraria'] .mf-toast,
+[data-theme='waterraria'] .mf-popover {
+  border: 2px solid var(--wr-slot-edge);
+}
+
+/* The title strip is a slot row: blue, outlined white caption. */
+[data-theme='waterraria'] .mf-window-title {
+  border-bottom: 2px solid var(--wr-slot-edge);
+  background: var(--wr-slot);
+  color: #ffffff;
+  font-family: var(--wr-pixel);
+  font-weight: 600;
+  text-shadow: var(--wr-outline);
+  --color-ink: #ffffff;
+  --color-ink-muted: #d6e4ff;
+}
+
+[data-theme='waterraria'] .mf-window-close:hover {
+  color: var(--wr-gold-soft);
+  background: var(--wr-slot-hover);
+}
+
+[data-theme='waterraria'] .mf-window-foot {
+  border-top: 2px solid var(--color-line);
+}
+
+[data-theme='waterraria'] .mf-theme-card[aria-checked='true'] {
+  border: 2px solid var(--wr-row-edge);
+}
+
+/* -------------------------------------------------------------- taskbar */
+
+/* The water surface again, along the bottom; each window is a slot. */
+[data-theme='waterraria'] .mf-taskbar {
+  border-top: 2px solid var(--wr-slot-edge);
+  background: var(--wr-bar);
+}
+
+[data-theme='waterraria'] .mf-window-min:hover {
+  color: var(--wr-gold-soft);
+  background: var(--wr-slot-hover);
+}
+
+/* --------------------------------------------------------- theme preview */
+
+.mf-thumb[data-theme='waterraria'] {
+  background:
+    var(--wr-bubbles) 0 0 / 90px 130px repeat,
+    var(--wr-scene) center bottom / cover no-repeat,
+    var(--wr-water);
+  border-color: var(--wr-slot-edge);
+}
+
+.mf-thumb[data-theme='waterraria'] .mf-thumb-bar {
+  background:
+    var(--wr-foam) left bottom / 16px 4px repeat-x,
+    var(--wr-bar);
+  border-bottom-color: transparent;
+}
+
+.mf-thumb[data-theme='waterraria'] .mf-thumb-brand {
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #050a1e;
+}
+
+.mf-thumb[data-theme='waterraria'] .mf-thumb-cta {
+  background: linear-gradient(180deg, #ffe58a 0 45%, #f5bd36 45% 100%);
+  box-shadow: 0 0 0 1px #6b3f0a;
+}
+
+.mf-thumb[data-theme='waterraria'] .mf-thumb-nav .mf-thumb-sel {
+  background: var(--wr-slot);
+  box-shadow: 0 0 0 1px var(--wr-gold);
+}
+
+.mf-thumb[data-theme='waterraria'] .mf-thumb-list,
+.mf-thumb[data-theme='waterraria'] .mf-thumb-reader {
+  background: var(--wr-panel);
+}
+
+.mf-thumb[data-theme='waterraria'] .mf-thumb-list .mf-thumb-sel {
+  background: var(--wr-row);
+  box-shadow: inset 0 0 0 1px var(--wr-row-edge);
+}
+
+/* ------------------------------------------------ button fill: water rising */
+
+/*
+ * A button fills like a glass: the water level climbs from the bottom with
+ * the pixel foam on its surface and a few bubbles rising through it. The
+ * button's stepped corners (clip-path) also clip the water.
+ */
+[data-theme='waterraria'] .mf-fill {
+  inset: auto 0 0 0;
+  height: calc(var(--mf-fill, 0) * 100% + 4px);
+  max-height: 100%;
+  border-radius: 0;
+  clip-path: none;
+  /* The top 4px are the foam's: the water body starts under it, deep blue
+     and nearly opaque, so it reads as water even over the gold button. */
+  background: linear-gradient(180deg, #3fb4f0 0 3px, #1f86d6 3px 45%, #145fae 100%) 0 4px /
+    100% calc(100% - 4px) no-repeat;
+  image-rendering: pixelated;
+}
+
+/*
+ * Over water the label turns white with the pixel outline, like every
+ * inventory caption: the gold button's dark brown would sink into the blue.
+ * The outline keeps it readable over the gold part not yet filled.
+ */
+[data-theme='waterraria'] :is(.mf-btn, .mf-btn-primary, .mf-icon-btn)[aria-busy='true'] {
+  color: #ffffff;
+  text-shadow: var(--wr-outline);
+  --color-ink: #ffffff;
+  --color-ink-muted: #ffffff;
+}
+
+[data-theme='waterraria'] .mf-fill::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--wr-foam) 0 0 / 16px 4px repeat-x;
+  animation: wr-fill-wave 1.2s steps(16) infinite;
+}
+
+[data-theme='waterraria'] .mf-fill::after {
+  inset: auto 0 0;
+  width: auto;
+  height: 28px;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='28' shape-rendering='crispEdges'><g fill='%23e6f8ff' fill-opacity='.8'><path d='M7 20h2v1H7zM6 21h1v2H6zM9 21h1v2H9zM7 23h2v1H7z'/><path d='M30 12h2v1h-2zM29 13h1v2h-1zM32 13h1v2h-1zM30 15h2v1h-2z'/><path d='M19 4h1v1h-1zM41 22h1v1h-1z'/></g></svg>")
+    0 0 / 48px 28px repeat-x;
+  animation: wr-fill-bubbles 1.6s steps(14) infinite;
+}
+
+[data-theme='waterraria'] .mf-fill[data-state='done'] {
+  transition: opacity 0.42s steps(4);
+}
+
+@keyframes wr-fill-wave {
+  to {
+    background-position-x: 16px;
+  }
+}
+
+@keyframes wr-fill-bubbles {
+  from {
+    transform: translateY(14px);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+}

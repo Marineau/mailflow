@@ -1,0 +1,1059 @@
+/*
+ * Cristal — after the Aero look of Windows Vista.
+ *
+ * The reference is Windows Mail and Explorer as shipped in 2006: a glass
+ * frame over the desktop wallpaper, white panes, a pale blue navigation
+ * pane, two-tone glossy buttons, the rounded blue selection, the yellow
+ * information bar, and the green progress bar.
+ * Light mode is the stock Aero scheme. Dark mode borrows the black glass of
+ * the Vista taskbar and of Windows Media Player 11.
+ *
+ * The app fills the viewport, so it is drawn as a maximized window: glass in
+ * the caption area only, no side frame. Floating panels (composer, theme
+ * dialog) get the full frame, and blur what is behind them.
+ *
+ * Layout of this file: tokens per mode, then the skin. Every skin rule is
+ * prefixed by [data-theme='vista']; rules for the theme preview are keyed on
+ * the preview element itself, so they do not leak into the preview of
+ * another theme.
+ */
+
+/* ------------------------------------------------------------------ tokens */
+
+[data-theme='vista'][data-mode='light'] {
+  --font-sans: 'Segoe UI', 'Segoe UI Variable Text', Tahoma, Verdana, sans-serif;
+  --color-canvas: #ffffff;
+  --color-surface: #eef3fa;
+  --color-surface-hover: #dcebfc;
+  --color-line: #d3dbe6;
+  --color-ink: #1b1b1b;
+  --color-ink-muted: #5b6573;
+  --color-accent: #0b63c5;
+  --color-on-accent: #ffffff;
+  --color-warn: #a34a00;
+  --color-flag: #f2a50c;
+
+  --mf-bone: #e2e8f0;
+  --mf-sweep: rgb(255 255 255 / 0.8);
+  --mf-track: #e6e6e6;
+
+  /* The desktop. Only the strip behind the caption is ever visible. */
+  --vista-wallpaper:
+    radial-gradient(46% 240px at 28% -30px, rgb(132 222 255 / 0.9), transparent 72%),
+    radial-gradient(52% 280px at 74% -10px, rgb(170 238 176 / 0.85), transparent 72%),
+    linear-gradient(100deg, #0a3f7c 0%, #0c6ba8 34%, #11899d 62%, #2c9c6c 100%);
+
+  /* Glass: a tint, a gloss along the top edge, and diagonal reflections. */
+  --vista-glass: rgb(205 228 249 / 0.56);
+  --vista-gloss: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.72) 0,
+    rgb(255 255 255 / 0.26) 27px,
+    rgb(255 255 255 / 0.07) 31px,
+    rgb(255 255 255 / 0.16) 64px,
+    transparent 96px
+  );
+  --vista-streaks: repeating-linear-gradient(
+    118deg,
+    transparent 0 70px,
+    rgb(255 255 255 / 0.2) 70px 112px,
+    transparent 112px 140px,
+    rgb(255 255 255 / 0.11) 140px 250px,
+    transparent 250px 460px
+  );
+  --vista-frame: rgb(0 0 0 / 0.55);
+  --vista-frame-light: rgb(255 255 255 / 0.7);
+  --vista-caption: #000000;
+  --vista-caption-glow: rgb(255 255 255 / 0.95);
+
+  /* Push button: two flat halves, a hard seam in the middle. */
+  --vista-btn: linear-gradient(to bottom, #f2f2f2 0, #ebebeb 49%, #dddddd 50%, #cfcfcf 100%);
+  --vista-btn-hot: linear-gradient(to bottom, #eaf6fd 0, #d9f0fc 49%, #bee6fd 50%, #a7d9f5 100%);
+  --vista-btn-down: linear-gradient(to bottom, #e5f4fc 0, #c4e5f6 49%, #98d1ef 50%, #68b3db 100%);
+  --vista-btn-ink: #000000;
+  --vista-btn-edge: #707070;
+  --vista-btn-edge-hot: #3c7fb1;
+  --vista-btn-edge-down: #2c628b;
+  --vista-btn-sheen: rgb(255 255 255 / 0.85);
+
+  /* Toolbar button: flat until hovered. */
+  --vista-tool-hot: linear-gradient(to bottom, #fdfeff 0, #edf5fd 49%, #dcebfc 50%, #d2e6fb 100%);
+  --vista-tool-hot-edge: #a5c3e6;
+  --vista-tool-down: linear-gradient(to bottom, #d5ecfa 0, #bfe2f7 49%, #a2d3f0 50%, #8ec7ea 100%);
+  --vista-tool-down-edge: #5b93c2;
+
+  /* List items. */
+  --vista-hot: linear-gradient(to bottom, #fafbfd, #ebf3fd);
+  --vista-hot-edge: #b8d6fb;
+  --vista-sel: linear-gradient(to bottom, #dcebfc, #c1dbfc);
+  --vista-sel-edge: #7da2ce;
+  --vista-sel-muted: #46505d;
+  --vista-row-edge: #edf1f6;
+  --vista-count: #0033cc;
+  --vista-sel-count: #0033cc;
+
+  --vista-pane: linear-gradient(to bottom, #fbfcfe 0, #e9f0fa 100%);
+  --vista-pane-edge: #b6c3d4;
+  --vista-head: linear-gradient(to bottom, #f8fbfe 0, #e3ecf8 100%);
+  --vista-heading: #003399;
+  --vista-foot: #f0f0f0;
+  --vista-foot-edge: #dfdfdf;
+  --vista-menu: #f5f6f7;
+  --vista-menu-edge: #979797;
+  --vista-balloon: linear-gradient(to bottom, #ffffff, #e4e5f0);
+  --vista-balloon-edge: #767676;
+  --vista-info: #ffffe1;
+  --vista-info-ink: #1b1b1b;
+  --vista-info-edge: #c9c59a;
+  --vista-field: #ffffff;
+  --vista-field-edge: #abadb3 #dbdfe6 #e3e9ef #e2e3ea;
+  --vista-field-edge-hot: #5794bf #b7d5ea #c7e2f1 #c5daed;
+  --vista-progress-track: linear-gradient(to bottom, #f4f4f4, #dcdcdc);
+  --vista-progress-edge: #b2b2b2;
+  --vista-scroll-track: linear-gradient(to right, #e3e3e3, #f1f1f1 35%, #f4f4f4);
+  --vista-scroll-thumb: linear-gradient(to right, #f7f7f8 0, #e8e9eb 49%, #d7d9dc 50%, #cbcdd2 100%);
+  --vista-scroll-thumb-hot: linear-gradient(to right, #e9f6fd 0, #d5eefb 49%, #b9e3fa 50%, #a6d8f4 100%);
+  --vista-scroll-edge: #979797;
+  --vista-scroll-edge-hot: #3c7fb1;
+}
+
+[data-theme='vista'][data-mode='dark'] {
+  --font-sans: 'Segoe UI', 'Segoe UI Variable Text', Tahoma, Verdana, sans-serif;
+  --color-canvas: #141a22;
+  --color-surface: #1f2935;
+  --color-surface-hover: #2a394b;
+  --color-line: #303d4c;
+  --color-ink: #f1f5f9;
+  --color-ink-muted: #9fb1c5;
+  --color-accent: #62b4ff;
+  --color-on-accent: #ffffff;
+  --color-warn: #ffc85c;
+  --color-flag: #ffc02e;
+
+  --mf-bone: #263242;
+  --mf-sweep: rgb(170 210 255 / 0.3);
+  --mf-track: #0c1118;
+
+  --vista-wallpaper:
+    radial-gradient(46% 240px at 28% -30px, rgb(40 150 210 / 0.55), transparent 72%),
+    radial-gradient(52% 280px at 74% -10px, rgb(40 170 120 / 0.45), transparent 72%),
+    linear-gradient(100deg, #020a16 0%, #05233b 36%, #063640 66%, #0a3528 100%);
+
+  --vista-glass: rgb(14 20 28 / 0.64);
+  --vista-gloss: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.3) 0,
+    rgb(255 255 255 / 0.1) 27px,
+    rgb(255 255 255 / 0.02) 31px,
+    rgb(255 255 255 / 0.06) 64px,
+    transparent 96px
+  );
+  --vista-streaks: repeating-linear-gradient(
+    118deg,
+    transparent 0 70px,
+    rgb(255 255 255 / 0.07) 70px 112px,
+    transparent 112px 140px,
+    rgb(255 255 255 / 0.04) 140px 250px,
+    transparent 250px 460px
+  );
+  --vista-frame: rgb(0 0 0 / 0.85);
+  --vista-frame-light: rgb(255 255 255 / 0.24);
+  --vista-caption: #ffffff;
+  --vista-caption-glow: rgb(0 0 0 / 0.9);
+
+  --vista-btn: linear-gradient(to bottom, #6b7684 0, #4a5460 49%, #2b333c 50%, #3b4551 100%);
+  --vista-btn-hot: linear-gradient(to bottom, #8cbde8 0, #5292cb 49%, #24609d 50%, #3d82c4 100%);
+  --vista-btn-down: linear-gradient(to bottom, #5292cb 0, #3070ab 49%, #174a80 50%, #26619f 100%);
+  --vista-btn-ink: #ffffff;
+  --vista-btn-edge: #080b10;
+  --vista-btn-edge-hot: #0b2a4c;
+  --vista-btn-edge-down: #071d36;
+  --vista-btn-sheen: rgb(255 255 255 / 0.24);
+
+  --vista-tool-hot: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.24) 0,
+    rgb(255 255 255 / 0.11) 49%,
+    rgb(255 255 255 / 0.03) 50%,
+    rgb(255 255 255 / 0.1) 100%
+  );
+  --vista-tool-hot-edge: rgb(255 255 255 / 0.3);
+  --vista-tool-down: linear-gradient(to bottom, rgb(96 166 234 / 0.6), rgb(40 100 170 / 0.6));
+  --vista-tool-down-edge: #6aa7e0;
+
+  --vista-hot: linear-gradient(to bottom, rgb(130 185 245 / 0.17), rgb(130 185 245 / 0.07));
+  --vista-hot-edge: rgb(150 200 250 / 0.32);
+  --vista-sel: linear-gradient(to bottom, #366aa0, #224f7f);
+  --vista-sel-edge: #6aa7e0;
+  --vista-sel-muted: #d6e4f3;
+  --vista-row-edge: #1e2732;
+  --vista-count: #7fc0ff;
+  /* The light blue count fades into the selection gradient. */
+  --vista-sel-count: #ffffff;
+
+  --vista-pane: linear-gradient(to bottom, #1b232d 0, #121820 100%);
+  --vista-pane-edge: #05080c;
+  --vista-head: linear-gradient(to bottom, #25303d 0, #1a232e 100%);
+  --vista-heading: #a6d5ff;
+  --vista-foot: #1b232d;
+  --vista-foot-edge: #2c3847;
+  --vista-menu: #222b36;
+  --vista-menu-edge: #05080c;
+  --vista-balloon: linear-gradient(to bottom, #2c3643, #1b232d);
+  --vista-balloon-edge: #05080c;
+  --vista-info: #3a3312;
+  --vista-info-ink: #fff0b8;
+  --vista-info-edge: #5c5220;
+  --vista-field: #0d1219;
+  --vista-field-edge: #05080c #2f3b49 #3a4757 #2f3b49;
+  --vista-field-edge-hot: #2f6ea8 #4d8fca #5a9cd6 #4d8fca;
+  --vista-progress-track: linear-gradient(to bottom, #0b0f15, #1b232d);
+  --vista-progress-edge: #05080c;
+  --vista-scroll-track: linear-gradient(to right, #0c1118, #161d26 35%, #19212b);
+  --vista-scroll-thumb: linear-gradient(to right, #66717e 0, #4a5460 49%, #333c47 50%, #404a56 100%);
+  --vista-scroll-thumb-hot: linear-gradient(to right, #86b8e4 0, #5292cb 49%, #2a68a6 50%, #3d82c4 100%);
+  --vista-scroll-edge: #05080c;
+  --vista-scroll-edge-hot: #0b2a4c;
+}
+
+/* ------------------------------------------------------- desktop and frame */
+
+[data-theme='vista'] body {
+  background: var(--vista-wallpaper);
+  background-attachment: fixed;
+}
+
+[data-theme='vista'] ::selection {
+  background: #3399ff;
+  color: #ffffff;
+}
+
+/* `.mf-stage`: the consent and error screens, one window alone on the wallpaper. */
+[data-theme='vista'] .mf-app,
+[data-theme='vista'] .mf-stage {
+  background: transparent;
+}
+
+/* Caption area of a maximized window: the glass runs down to the client edge. */
+[data-theme='vista'] .mf-titlebar {
+  background: var(--vista-streaks), var(--vista-gloss);
+  background-color: var(--vista-glass);
+  border-bottom-color: var(--vista-frame);
+  box-shadow:
+    inset 0 1px 0 var(--vista-frame-light),
+    inset 0 -1px 0 var(--vista-frame-light);
+}
+
+/* Caption text sits on a soft halo, so it reads over any wallpaper. */
+[data-theme='vista'] .mf-brand,
+[data-theme='vista'] .mf-window-title {
+  color: var(--vista-caption);
+  text-shadow:
+    0 0 4px var(--vista-caption-glow),
+    0 0 9px var(--vista-caption-glow),
+    0 0 15px var(--vista-caption-glow);
+}
+
+[data-theme='vista'] .mf-brand {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+[data-theme='vista'] .mf-titlebar .mf-icon-btn,
+[data-theme='vista'] .mf-titlebar .mf-titlebar-rule {
+  color: var(--vista-caption);
+  border-color: var(--vista-frame-light);
+}
+
+[data-theme='vista'] .mf-workspace {
+  background: var(--color-canvas);
+}
+
+/* -------------------------------------------------------------- buttons */
+
+[data-theme='vista'] .mf-btn {
+  border: 1px solid var(--vista-btn-edge);
+  border-radius: 3px;
+  background: var(--vista-btn);
+  color: var(--vista-btn-ink);
+  box-shadow: inset 0 0 0 1px var(--vista-btn-sheen);
+}
+
+[data-theme='vista'] .mf-btn:hover:not(:disabled) {
+  border-color: var(--vista-btn-edge-hot);
+  background: var(--vista-btn-hot);
+}
+
+[data-theme='vista'] .mf-btn:active:not(:disabled) {
+  border-color: var(--vista-btn-edge-down);
+  background: var(--vista-btn-down);
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.3);
+}
+
+/* The one action that matters on a surface: blue glass, same in both modes. */
+[data-theme='vista'] .mf-btn-primary {
+  border: 1px solid #143f73;
+  border-radius: 4px;
+  background:
+    linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.58) 0,
+      rgb(255 255 255 / 0.2) 49%,
+      rgb(255 255 255 / 0) 50%,
+      rgb(255 255 255 / 0.14) 100%
+    ),
+    linear-gradient(to bottom, #4d97dd 0, #2a74c6 49%, #1458a8 50%, #2f86d6 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgb(0 28 74 / 0.75);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.4),
+    0 1px 2px rgb(0 0 0 / 0.35);
+}
+
+[data-theme='vista'] .mf-btn-primary:hover:not(:disabled) {
+  opacity: 1;
+  filter: brightness(1.09) saturate(1.08);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.5),
+    0 0 7px 1px rgb(110 196 255 / 0.85),
+    0 1px 2px rgb(0 0 0 / 0.35);
+}
+
+[data-theme='vista'] .mf-btn-primary:active:not(:disabled) {
+  filter: brightness(0.92);
+  box-shadow: inset 0 2px 4px rgb(0 20 60 / 0.5);
+}
+
+[data-theme='vista'] .mf-icon-btn {
+  border-radius: 3px;
+}
+
+[data-theme='vista'] .mf-icon-btn:hover:not(:disabled) {
+  background: var(--vista-tool-hot);
+  box-shadow:
+    0 0 0 1px var(--vista-tool-hot-edge),
+    inset 0 0 0 1px rgb(255 255 255 / 0.5);
+}
+
+[data-theme='vista'] .mf-icon-btn:active:not(:disabled),
+[data-theme='vista'] .mf-icon-btn[aria-pressed='true'] {
+  background: var(--vista-tool-down);
+  box-shadow:
+    0 0 0 1px var(--vista-tool-down-edge),
+    inset 0 1px 2px rgb(0 0 0 / 0.2);
+}
+
+/* ---------------------------------------------------------------- fields */
+
+[data-theme='vista'] .mf-input,
+[data-theme='vista'] .mf-select {
+  border: 1px solid;
+  border-color: var(--vista-field-edge);
+  border-radius: 2px;
+  background: var(--vista-field);
+  color: var(--color-ink);
+}
+
+[data-theme='vista'] .mf-input {
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.1);
+}
+
+[data-theme='vista'] .mf-input::placeholder {
+  font-style: italic;
+}
+
+[data-theme='vista'] .mf-input:hover,
+[data-theme='vista'] .mf-input:focus,
+[data-theme='vista'] .mf-select:hover,
+[data-theme='vista'] .mf-select:focus {
+  border-color: var(--vista-field-edge-hot);
+}
+
+/* ------------------------------------------------------- navigation pane */
+
+[data-theme='vista'] .mf-nav {
+  background: var(--vista-pane);
+  border-right-color: var(--vista-pane-edge);
+}
+
+[data-theme='vista'] .mf-nav-item {
+  border-radius: 3px;
+  background: none;
+  color: var(--color-ink);
+}
+
+[data-theme='vista'] .mf-nav-item:hover:not(:disabled) {
+  background: var(--vista-hot);
+  box-shadow: inset 0 0 0 1px var(--vista-hot-edge);
+}
+
+[data-theme='vista'] .mf-nav-item[aria-current] {
+  background: var(--vista-sel);
+  box-shadow:
+    inset 0 0 0 1px var(--vista-sel-edge),
+    inset 0 0 0 2px rgb(255 255 255 / 0.3);
+  --color-ink-muted: var(--vista-sel-muted);
+}
+
+/* Unread count the way Windows Mail wrote it: a bold blue "(12)". */
+[data-theme='vista'] .mf-badge {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--vista-count);
+  font-weight: 700;
+}
+
+[data-theme='vista'] .mf-nav-item[aria-current] .mf-badge {
+  color: var(--vista-sel-count);
+}
+
+[data-theme='vista'] .mf-badge::before {
+  content: '(';
+}
+
+[data-theme='vista'] .mf-badge::after {
+  content: ')';
+}
+
+/* ----------------------------------------------------------------- icons */
+
+/*
+ * Vista's icons were full color pictures, not line drawings. The theme brings
+ * its own set through the icon slot (see `components/icons.tsx`): one file per
+ * icon in `vista-icons/`, drawn on a 16 px grid, with outlines in mid tones
+ * so that a picture reads on the white panes and on the black glass alike.
+ *
+ * Not drawn, on purpose: the marks that are glyphs rather than objects (close,
+ * check, grip, spinner) and the text formatting letters. They follow the text
+ * color, which a picture cannot do.
+ *
+ * The first rule lists every icon that has artwork; each of the rules after
+ * it only names the file. Adding an icon is one line in each.
+ */
+[data-theme='vista'] .mf-icon:is(
+    [data-icon='alert-circle'],
+    [data-icon='archive'],
+    [data-icon='ban'],
+    [data-icon='database'],
+    [data-icon='download'],
+    [data-icon='eye-off'],
+    [data-icon='file-text'],
+    [data-icon='folder'],
+    [data-icon='folder-down'],
+    [data-icon='forward'],
+    [data-icon='highlighter'],
+    [data-icon='image'],
+    [data-icon='image-off'],
+    [data-icon='inbox'],
+    [data-icon='lightbulb'],
+    [data-icon='lightbulb-off'],
+    [data-icon='link'],
+    [data-icon='link-2-off'],
+    [data-icon='moon'],
+    [data-icon='palette'],
+    [data-icon='paperclip'],
+    [data-icon='reply'],
+    [data-icon='reply-all'],
+    [data-icon='search'],
+    [data-icon='send'],
+    [data-icon='shield-alert'],
+    [data-icon='shield-off'],
+    [data-icon='star'],
+    [data-icon='sun'],
+    [data-icon='trash-2']
+  ) {
+  background: center / contain no-repeat;
+  fill: none;
+  stroke: none;
+}
+
+[data-theme='vista'] .mf-icon[data-icon='alert-circle'] {
+  background-image: url('./vista-icons/alert-circle.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='archive'] {
+  background-image: url('./vista-icons/archive.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='ban'] {
+  background-image: url('./vista-icons/ban.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='database'] {
+  background-image: url('./vista-icons/database.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='download'] {
+  background-image: url('./vista-icons/download.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='eye-off'] {
+  background-image: url('./vista-icons/eye-off.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='file-text'] {
+  background-image: url('./vista-icons/file-text.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='folder'] {
+  background-image: url('./vista-icons/folder.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='folder-down'] {
+  background-image: url('./vista-icons/folder-down.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='forward'] {
+  background-image: url('./vista-icons/forward.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='highlighter'] {
+  background-image: url('./vista-icons/highlighter.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='image'] {
+  background-image: url('./vista-icons/image.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='image-off'] {
+  background-image: url('./vista-icons/image-off.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='inbox'] {
+  background-image: url('./vista-icons/inbox.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='lightbulb'] {
+  background-image: url('./vista-icons/lightbulb.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='lightbulb-off'] {
+  background-image: url('./vista-icons/lightbulb-off.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='link'] {
+  background-image: url('./vista-icons/link.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='link-2-off'] {
+  background-image: url('./vista-icons/link-2-off.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='moon'] {
+  background-image: url('./vista-icons/moon.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='palette'] {
+  background-image: url('./vista-icons/palette.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='paperclip'] {
+  background-image: url('./vista-icons/paperclip.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='reply'] {
+  background-image: url('./vista-icons/reply.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='reply-all'] {
+  background-image: url('./vista-icons/reply-all.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='search'] {
+  background-image: url('./vista-icons/search.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='send'] {
+  background-image: url('./vista-icons/send.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='shield-alert'] {
+  background-image: url('./vista-icons/shield-alert.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='shield-off'] {
+  background-image: url('./vista-icons/shield-off.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='star'] {
+  background-image: url('./vista-icons/star.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='sun'] {
+  background-image: url('./vista-icons/sun.svg');
+}
+
+[data-theme='vista'] .mf-icon[data-icon='trash-2'] {
+  background-image: url('./vista-icons/trash-2.svg');
+}
+
+/* The follow-up star: grey when off, gold when on. */
+[data-theme='vista'] .mf-icon[data-icon='star'][data-on] {
+  background-image: url('./vista-icons/star-on.svg');
+}
+
+/*
+ * Where an icon sits on a filled ground — the blue glass of the main button,
+ * the disc of a notification — it stays a line in the text color: a picture
+ * made for a pale toolbar has no contrast there.
+ */
+[data-theme='vista'] :is(.mf-btn-primary, .mf-toast-icon) .mf-icon[data-icon] {
+  background: none;
+  stroke: currentColor;
+}
+
+/* ---------------------------------------------------------- message list */
+
+[data-theme='vista'] .mf-row {
+  border-bottom-color: var(--vista-row-edge);
+}
+
+[data-theme='vista'] .mf-row:hover {
+  background: var(--vista-hot);
+  box-shadow: inset 0 0 0 1px var(--vista-hot-edge);
+}
+
+[data-theme='vista'] .mf-row[aria-current] {
+  background: var(--vista-sel);
+  box-shadow: inset 0 0 0 1px var(--vista-sel-edge);
+  --color-ink-muted: var(--vista-sel-muted);
+}
+
+[data-theme='vista'] .mf-unread-dot {
+  background: radial-gradient(circle at 35% 30%, #dcf2ff 0, #4aa8f0 45%, #0b5cc0 100%);
+  box-shadow: 0 0 0 1px rgb(8 60 130 / 0.55);
+}
+
+/* ---------------------------------------------------------- reading pane */
+
+[data-theme='vista'] .mf-reader-head,
+[data-theme='vista'] .mf-toolbar {
+  background: var(--vista-head);
+  border-bottom-color: var(--vista-pane-edge);
+}
+
+/* "Main instruction" type: larger, regular weight, dark blue. */
+[data-theme='vista'] .mf-heading {
+  color: var(--vista-heading);
+  font-size: 1.0625rem;
+  font-weight: 400;
+}
+
+/* The user tile: a rounded square in a glossy frame. */
+[data-theme='vista'] .mf-avatar {
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #eaf5ff 0, #bcd9f6 49%, #9cc3ec 50%, #c6def6 100%);
+  color: #17365d;
+  box-shadow:
+    0 0 0 1px #6f8fb3,
+    inset 0 0 0 1px rgb(255 255 255 / 0.8),
+    0 1px 3px rgb(0 0 0 / 0.3);
+}
+
+/* Blocked pictures are announced the way IE7 and Windows Mail did. */
+[data-theme='vista'] .mf-infobar {
+  background: var(--vista-info);
+  border-bottom-color: var(--vista-info-edge);
+  color: var(--vista-info-ink);
+  --color-ink-muted: var(--vista-info-ink);
+}
+
+/* --------------------------------------------------- windows and popups */
+
+[data-theme='vista'] .mf-window {
+  padding: 0 7px 7px;
+  border: 1px solid var(--vista-frame);
+  border-radius: 8px;
+  background: var(--vista-streaks), var(--vista-gloss);
+  background-color: var(--vista-glass);
+  -webkit-backdrop-filter: blur(9px) saturate(1.35);
+  backdrop-filter: blur(9px) saturate(1.35);
+  color: var(--color-ink);
+  box-shadow:
+    inset 0 0 0 1px var(--vista-frame-light),
+    0 16px 46px rgb(0 0 0 / 0.5),
+    0 2px 8px rgb(0 0 0 / 0.3);
+}
+
+/* Files dragged over the composer: the frame lights up. */
+[data-theme='vista'] .mf-window[data-dragging] {
+  box-shadow:
+    inset 0 0 0 1px var(--vista-frame-light),
+    0 0 0 3px rgb(80 170 255 / 0.85),
+    0 16px 46px rgb(0 0 0 / 0.5);
+}
+
+[data-theme='vista'] .mf-window-title {
+  height: 30px;
+  flex-shrink: 0;
+  padding: 0 0 0 5px;
+  border-bottom: 0;
+  font-weight: 400;
+}
+
+/* Captions were set in the regular weight; the utilities ask for medium. */
+[data-theme='vista'] .mf-window-title * {
+  font-weight: 400;
+}
+
+[data-theme='vista'] .mf-window-title svg {
+  filter: drop-shadow(0 0 3px var(--vista-caption-glow));
+}
+
+/* The red caption button hangs from the top edge of the frame. */
+[data-theme='vista'] .mf-window-close {
+  align-self: flex-start;
+  margin-top: -1px;
+  padding: 2px 15px 3px;
+  border: 1px solid rgb(0 0 0 / 0.6);
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(to bottom, #e9aa9d 0, #d87966 45%, #c23a21 50%, #d65a3b 100%);
+  color: #ffffff;
+  text-shadow: none;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.42);
+}
+
+[data-theme='vista'] .mf-window-close:hover {
+  background: linear-gradient(to bottom, #f8b9aa 0, #f08169 45%, #de2a0a 50%, #f67d4e 100%);
+  color: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.5),
+    0 0 9px 1px rgb(255 92 60 / 0.9);
+}
+
+[data-theme='vista'] .mf-window-close svg {
+  stroke-width: 3;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.65));
+}
+
+/* Client area: an opaque sheet set into the glass. */
+[data-theme='vista'] .mf-window-body {
+  overflow: hidden;
+  border: 1px solid var(--vista-frame);
+  border-radius: 1px;
+  background: var(--color-canvas);
+  box-shadow: 0 0 0 1px var(--vista-frame-light);
+}
+
+/* Command area at the bottom of a dialog. */
+[data-theme='vista'] .mf-window-foot {
+  background: var(--vista-foot);
+  border-top-color: var(--vista-foot-edge);
+}
+
+[data-theme='vista'] .mf-popover {
+  border-color: var(--vista-menu-edge);
+  border-radius: 2px;
+  background: var(--vista-menu);
+  box-shadow: 3px 3px 6px rgb(0 0 0 / 0.35);
+}
+
+[data-theme='vista'] .mf-option {
+  width: calc(100% - 4px);
+  margin: 0 2px;
+  border-radius: 3px;
+}
+
+[data-theme='vista'] .mf-option[aria-selected='true'] {
+  background: var(--vista-sel);
+  box-shadow: inset 0 0 0 1px var(--vista-sel-edge);
+  --color-ink-muted: var(--vista-sel-muted);
+}
+
+/* Notification balloon. */
+[data-theme='vista'] .mf-toast {
+  border-color: var(--vista-balloon-edge);
+  border-radius: 5px;
+  background: var(--vista-balloon);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.38);
+}
+
+[data-theme='vista'] .mf-theme-card {
+  border-radius: 4px;
+}
+
+[data-theme='vista'] .mf-theme-card:hover {
+  border-color: var(--vista-hot-edge);
+  background: var(--vista-hot);
+}
+
+[data-theme='vista'] .mf-theme-card[aria-checked='true'] {
+  border-color: var(--vista-sel-edge);
+  background: var(--vista-sel);
+  --color-ink-muted: var(--vista-sel-muted);
+}
+
+/* -------------------------------------------------------------- progress */
+
+[data-theme='vista'] .mf-progress {
+  height: 12px;
+  border-radius: 3px;
+  background: var(--vista-progress-track);
+  box-shadow: inset 0 0 0 1px var(--vista-progress-edge);
+}
+
+[data-theme='vista'] .mf-toast .mf-progress {
+  height: 9px;
+  border-radius: 0;
+  box-shadow: inset 0 -1px 0 var(--vista-progress-edge);
+}
+
+[data-theme='vista'] .mf-progress-fill,
+[data-theme='vista'] .mf-indet-bar {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.68) 0,
+      rgb(255 255 255 / 0.22) 45%,
+      rgb(255 255 255 / 0) 50%,
+      rgb(255 255 255 / 0.2) 100%
+    ),
+    linear-gradient(to right, #0cab21, #34d543);
+}
+
+/* Vista turned a failed operation's bar red. */
+[data-theme='vista'] .mf-progress-fill[data-state='error'] {
+  background:
+    linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.6) 0,
+      rgb(255 255 255 / 0.2) 45%,
+      rgb(255 255 255 / 0) 50%,
+      rgb(255 255 255 / 0.18) 100%
+    ),
+    linear-gradient(to right, #c81e12, #ee4a33);
+}
+
+/* The highlight that keeps sweeping across the filled part. */
+[data-theme='vista'] .mf-progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(to right, transparent, rgb(255 255 255 / 0.75), transparent);
+  animation: vista-shine 2.4s linear infinite;
+}
+
+[data-theme='vista'] .mf-indet-track {
+  height: 4px;
+  background: var(--vista-progress-track);
+}
+
+@keyframes vista-shine {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(350%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='vista'] .mf-progress-fill::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------ scrollbars */
+
+/*
+ * Only where the engine can draw them. Elsewhere the thin token-colored
+ * scrollbars from index.css stay.
+ */
+@supports selector(::-webkit-scrollbar) {
+  [data-theme='vista'],
+  [data-theme='vista'] * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+
+  [data-theme='vista'] ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+
+  [data-theme='vista'] ::-webkit-scrollbar-track,
+  [data-theme='vista'] ::-webkit-scrollbar-corner {
+    background: var(--vista-scroll-track);
+  }
+
+  [data-theme='vista'] ::-webkit-scrollbar-thumb {
+    border: 1px solid var(--vista-scroll-edge);
+    border-radius: 3px;
+    background: var(--vista-scroll-thumb);
+    box-shadow: inset 0 0 0 1px var(--vista-btn-sheen);
+  }
+
+  [data-theme='vista'] ::-webkit-scrollbar-thumb:hover {
+    border-color: var(--vista-scroll-edge-hot);
+    background: var(--vista-scroll-thumb-hot);
+  }
+}
+
+/* ------------------------------------------------- minimize and taskbar */
+
+/*
+ * Minimize hangs from the frame beside the red close button, in clear
+ * glass, the pair joined like Vista's caption buttons: rounded only on the
+ * outer bottom corners.
+ */
+[data-theme='vista'] .mf-window-min {
+  align-self: flex-start;
+  margin-top: -1px;
+  padding: 2px 10px 3px;
+  border: 1px solid rgb(0 0 0 / 0.6);
+  border-right: 0;
+  border-radius: 0 0 0 5px;
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.62) 0,
+    rgb(255 255 255 / 0.3) 45%,
+    rgb(255 255 255 / 0.08) 50%,
+    rgb(255 255 255 / 0.28) 100%
+  );
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.42);
+}
+
+[data-theme='vista'] .mf-window-min:hover {
+  background: linear-gradient(
+    to bottom,
+    rgb(220 240 255 / 0.85) 0,
+    rgb(150 205 250 / 0.6) 45%,
+    rgb(60 150 230 / 0.55) 50%,
+    rgb(120 200 255 / 0.7) 100%
+  );
+  color: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.5),
+    0 0 9px 1px rgb(110 196 255 / 0.85);
+}
+
+[data-theme='vista'] .mf-window-min svg {
+  stroke-width: 3;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.65));
+}
+
+[data-theme='vista'] .mf-window-min + .mf-window-close {
+  margin-left: -4px;
+  border-radius: 0 0 5px 0;
+}
+
+/* The taskbar: black glass, buttons of dark glass with white captions. */
+[data-theme='vista'] .mf-taskbar {
+  border-top: 1px solid rgb(255 255 255 / 0.28);
+  background:
+    linear-gradient(to bottom, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0) 50%),
+    rgb(8 12 20 / 0.86);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme='vista'] .mf-taskbar-item {
+  border: 1px solid rgb(0 0 0 / 0.7);
+  border-radius: 3px;
+  background:
+    linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.22) 0,
+      rgb(255 255 255 / 0.08) 49%,
+      rgb(0 0 0 / 0.12) 50%,
+      rgb(255 255 255 / 0.1) 100%
+    );
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.8);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22);
+}
+
+[data-theme='vista'] .mf-taskbar-item:hover:not(:disabled) {
+  border-color: rgb(0 0 0 / 0.7);
+  background:
+    linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.36) 0,
+      rgb(255 255 255 / 0.16) 49%,
+      rgb(0 0 0 / 0.05) 50%,
+      rgb(255 255 255 / 0.18) 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.35),
+    0 0 8px rgb(110 196 255 / 0.6);
+}
+
+/* --------------------------------------------------------- theme preview */
+
+.mf-thumb[data-theme='vista'] {
+  background: var(--vista-wallpaper);
+}
+
+.mf-thumb[data-theme='vista'] .mf-thumb-bar {
+  background: var(--vista-streaks), var(--vista-gloss);
+  background-color: var(--vista-glass);
+  border-bottom-color: var(--vista-frame);
+}
+
+.mf-thumb[data-theme='vista'] .mf-thumb-panes {
+  background: var(--color-canvas);
+}
+
+.mf-thumb[data-theme='vista'] .mf-thumb-brand {
+  background: var(--vista-caption);
+}
+
+.mf-thumb[data-theme='vista'] .mf-thumb-field {
+  border: 1px solid;
+  border-color: var(--vista-field-edge);
+  border-radius: 1px;
+  background: var(--vista-field);
+}
+
+.mf-thumb[data-theme='vista'] .mf-thumb-cta {
+  border-radius: 2px;
+  background:
+    linear-gradient(to bottom, rgb(255 255 255 / 0.55) 0, rgb(255 255 255 / 0) 50%),
+    linear-gradient(to bottom, #2a74c6 0, #1458a8 100%);
+  box-shadow: 0 0 0 1px #143f73;
+}
+
+.mf-thumb[data-theme='vista'] .mf-thumb-nav {
+  background: var(--vista-pane);
+  border-right-color: var(--vista-pane-edge);
+}
+
+.mf-thumb[data-theme='vista'] .mf-thumb-sel {
+  border-radius: 2px;
+  background: var(--vista-sel);
+  box-shadow: inset 0 0 0 1px var(--vista-sel-edge);
+}
+
+.mf-thumb[data-theme='vista'] .mf-thumb-head {
+  background: var(--vista-head);
+  border-bottom-color: var(--vista-pane-edge);
+}
+
+/* ------------------------------------- button fill: the green glass bar */
+
+/*
+ * A button fills with Vista's own progress bar: green glass with its gloss,
+ * and the glint that keeps sweeping over the filled part.
+ */
+[data-theme='vista'] .mf-fill {
+  background:
+    linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.55) 0,
+      rgb(255 255 255 / 0.18) 45%,
+      rgb(255 255 255 / 0) 50%,
+      rgb(255 255 255 / 0.16) 100%
+    ),
+    linear-gradient(to right, rgb(12 171 33 / 0.62), rgb(52 213 67 / 0.72));
+}
+
+[data-theme='vista'] .mf-fill::after {
+  background: linear-gradient(to right, transparent, rgb(255 255 255 / 0.7), transparent);
+  animation: vista-shine 2.4s linear infinite;
+}

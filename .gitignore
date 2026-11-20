@@ -1,0 +1,24 @@
+node_modules/
+dist/
+client/dist-staging/
+client/dist-previous/
+desktop/release/
+.env
+.env.local
+*.local
+data/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+desktop/app/THIRD-PARTY-NOTICES.txt
+
+# Personal working notes and the author's daily launcher: kept on disk, not published.
+/CLAUDE.md
+/MEMORY.md
+/dette-technique.md
+/scripts/launch.ps1
+/scripts/mailflow.vbs

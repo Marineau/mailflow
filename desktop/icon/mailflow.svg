@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- mailFlow's application icon. The blue is the accent of the original
+       theme; the envelope is drawn large and without detail so that it still
+       reads at 16 px. Source of mailflow.ico: `npm run desktop:icon`. -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6aa8fb"/>
+      <stop offset="1" stop-color="#3a78e4"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#tile)"/>
+  <rect x="44" y="72" width="168" height="112" rx="16" fill="#ffffff"/>
+  <path d="M58 90 L128 142 L198 90" fill="none" stroke="#2f66cf" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

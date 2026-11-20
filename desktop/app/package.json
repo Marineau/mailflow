@@ -1,0 +1,12 @@
+{
+  "name": "mailflow",
+  "productName": "mailFlow",
+  "description": "Client mail IMAP/SMTP",
+  "author": "Marineau",
+  "private": true,
+  "main": "dist/main.js",
+  "dependencies": {
+    "better-sqlite3": "13.2.0"
+  },
+  "license": "MIT"
+}

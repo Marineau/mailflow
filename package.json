@@ -1,0 +1,33 @@
+{
+  "name": "mailflow",
+  "private": true,
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "dev:server": "npm run dev -w server",
+    "dev:client": "npm run dev -w client",
+    "start": "node scripts/ensure-client.mjs & npm run start -w server",
+    "build": "npm run build -w client",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w client && tsc -p desktop/tsconfig.json --noEmit",
+    "desktop:icon": "electron desktop/icon/make-icon.cjs",
+    "desktop:stage": "node desktop/build.mjs",
+    "desktop:start": "npm run desktop:stage && electron desktop/app",
+    "desktop:pack": "npm run desktop:stage && electron-builder --config desktop/electron-builder.config.cjs --dir",
+    "desktop:dist": "npm run desktop:stage && electron-builder --config desktop/electron-builder.config.cjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^45.3.4",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
