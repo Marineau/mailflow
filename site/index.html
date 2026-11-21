@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="fr" data-lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mailFlow</title>
+<meta name="description" content="mailFlow, un client de messagerie pour Windows, libre et privé, qui fonctionne par IMAP et SMTP.">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<script>
+  // Language before first paint: saved choice, else the browser's language.
+  (function () {
+    var lang;
+    try { lang = localStorage.getItem('mailflow.site-lang'); } catch (e) {}
+    if (lang !== 'fr' && lang !== 'en') {
+      lang = /^fr\b/i.test(navigator.language || '') ? 'fr' : 'en';
+    }
+    document.documentElement.lang = lang;
+    document.documentElement.dataset.lang = lang;
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f6f8fc;
+    --surface: #ffffff;
+    --ink: #172033;
+    --muted: #5a6478;
+    --line: #dfe4ee;
+    --accent: #3a78e4;
+    --accent-ink: #ffffff;
+    --accent-soft: #e6effd;
+    --warn-bg: #fff6e0;
+    --warn-ink: #6b4a00;
+    --shadow: 0 1px 2px rgba(23, 32, 51, .06), 0 8px 24px rgba(23, 32, 51, .08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1420;
+      --surface: #171e2d;
+      --ink: #e7ebf3;
+      --muted: #9aa4b8;
+      --line: #263045;
+      --accent: #6aa8fb;
+      --accent-ink: #0b1220;
+      --accent-soft: #1a2a46;
+      --warn-bg: #2e2612;
+      --warn-ink: #f0d58c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1420;
+    --surface: #171e2d;
+    --ink: #e7ebf3;
+    --muted: #9aa4b8;
+    --line: #263045;
+    --accent: #6aa8fb;
+    --accent-ink: #0b1220;
+    --accent-soft: #1a2a46;
+    --warn-bg: #2e2612;
+    --warn-ink: #f0d58c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+  }
+
+  /* One language visible at a time. */
+  html[data-lang="fr"] [lang="en"]:not(html),
+  html[data-lang="en"] [lang="fr"]:not(html) { display: none !important; }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.6 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 0;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 650; font-size: 18px; color: var(--ink); text-decoration: none; }
+  .brand img { width: 32px; height: 32px; }
+  .top nav { display: flex; align-items: center; gap: 6px; }
+  .lang {
+    display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden;
+    background: var(--surface);
+  }
+  .lang button {
+    border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600;
+    padding: 5px 12px; cursor: pointer;
+  }
+  .lang button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .ghlink { font-size: 14px; color: var(--muted); text-decoration: none; padding: 6px 10px; }
+  .ghlink:hover { color: var(--ink); }
+
+  .hero {
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center;
+    padding: 48px 0 64px;
+  }
+  .hero h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.12; margin: 0 0 18px; letter-spacing: -.02em; }
+  .hero p.lead { font-size: 19px; color: var(--muted); margin: 0 0 28px; max-width: 34em; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 13px 22px; border-radius: 10px; font-weight: 600; text-decoration: none;
+    border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow); }
+  .btn-primary:hover { filter: brightness(1.06); }
+  .btn-ghost { border-color: var(--line); color: var(--ink); background: var(--surface); }
+  .btn-ghost:hover { border-color: var(--muted); }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .meta { margin-top: 12px; font-size: 14px; color: var(--muted); min-height: 1.6em; }
+
+  /* An abstract drawing of the three panes, not a screenshot. */
+  .shot {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); overflow: hidden; aspect-ratio: 4 / 3;
+    display: grid; grid-template-rows: 34px 1fr;
+  }
+  .shot .bar { display: flex; align-items: center; gap: 6px; padding: 0 12px; border-bottom: 1px solid var(--line); }
+  .shot .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+  .shot .panes { display: grid; grid-template-columns: 22% 34% 1fr; min-height: 0; }
+  .shot .panes > div { padding: 14px 12px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+  .shot .panes > div:last-child { border-right: 0; }
+  .ln { height: 8px; border-radius: 4px; background: var(--line); }
+  .ln.a { background: var(--accent); opacity: .85; }
+  .row { display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 8px; }
+  .row.sel { background: var(--accent-soft); }
+  .w30 { width: 30%; } .w45 { width: 45%; } .w60 { width: 60%; } .w75 { width: 75%; } .w90 { width: 90%; } .w100 { width: 100%; }
+
+  section { padding: 56px 0; border-top: 1px solid var(--line); }
+  section h2 { font-size: 28px; line-height: 1.2; margin: 0 0 12px; letter-spacing: -.01em; }
+  section p.intro { color: var(--muted); margin: 0 0 32px; max-width: 42em; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  .card h3 { margin: 12px 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .ico {
+    width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .ico svg { width: 20px; height: 20px; }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  ul.hosts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  ul.hosts li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; font-size: 15px; }
+  .strong-note { font-weight: 600; margin-top: 18px; }
+
+  ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 14px; }
+  ol.steps li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; }
+  ol.steps li::before {
+    content: counter(s); width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; font-size: 14px;
+  }
+  .warn { background: var(--warn-bg); color: var(--warn-ink); border-radius: 10px; padding: 14px 16px; font-size: 15px; margin-top: 22px; }
+  code { font-family: "Cascadia Code", Consolas, ui-monospace, monospace; font-size: .92em; background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+
+  .themes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .themes span { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 36px; padding-top: 24px; }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .two { grid-template-columns: 1fr; gap: 28px; }
+  }
+  @media (max-width: 560px) {
+    .grid { grid-template-columns: 1fr; }
+    .ghlink span { display: none; }
+    .btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<header class="wrap top">
+  <a class="brand" href="./"><img src="icon.svg" alt="" width="32" height="32">mailFlow</a>
+  <nav>
+    <a class="ghlink" href="https://github.com/Marineau/mailflow">GitHub<span> ↗</span></a>
+    <div class="lang" role="group" aria-label="Langue / Language">
+      <button type="button" data-set-lang="fr">FR</button>
+      <button type="button" data-set-lang="en">EN</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>
+        <span lang="fr">Votre messagerie, sur votre ordinateur et nulle part ailleurs.</span>
+        <span lang="en">Your mail, on your computer and nowhere else.</span>
+      </h1>
+      <p class="lead">
+        <span lang="fr">mailFlow est un client de messagerie pour Windows, libre et gratuit. Il relève et envoie vos courriels directement auprès de votre fournisseur, sans service intermédiaire, et ne charge aucun pisteur sans votre accord.</span>
+        <span lang="en">mailFlow is a free, open-source mail client for Windows. It reads and sends your mail directly with your provider, with no service in between, and loads no tracker without your consent.</span>
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary" id="download" href="https://github.com/Marineau/mailflow/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          <span lang="fr">Télécharger pour Windows</span>
+          <span lang="en">Download for Windows</span>
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/Marineau/mailflow">
+          <span lang="fr">Code source</span>
+          <span lang="en">Source code</span>
+        </a>
+      </div>
+      <div class="meta" id="meta">
+        <span lang="fr">Windows 10 et 11, 64 bits. Interface en français.</span>
+        <span lang="en">Windows 10 and 11, 64-bit. The interface is in French.</span>
+      </div>
+    </div>
+    <div class="shot" aria-hidden="true">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="panes">
+        <div>
+          <div class="ln a w75"></div><div class="ln w60"></div><div class="ln w90"></div><div class="ln w45"></div><div class="ln w60"></div>
+        </div>
+        <div>
+          <div class="row sel"><div class="ln a w60"></div><div class="ln w90"></div></div>
+          <div class="row"><div class="ln w45"></div><div class="ln w75"></div></div>
+          <div class="row"><div class="ln w60"></div><div class="ln w90"></div></div>
+          <div class="row"><div class="ln w30"></div><div class="ln w75"></div></div>
+        </div>
+        <div>
+          <div class="ln w60" style="height:12px"></div><div class="ln w30"></div>
+          <div style="height:8px"></div>
+          <div class="ln w100"></div><div class="ln w90"></div><div class="ln w100"></div><div class="ln w75"></div>
+          <div style="height:4px"></div>
+          <div class="ln w90"></div><div class="ln w60"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2><span lang="fr">Ce que fait mailFlow</span><span lang="en">What mailFlow does</span></h2>
+      <p class="intro">
+        <span lang="fr">Il fonctionne avec toute boîte qui accepte les protocoles IMAP et SMTP, c'est-à-dire la quasi-totalité d'entre elles.</span>
+        <span lang="en">It works with any mailbox that speaks IMAP and SMTP, which is nearly all of them.</span>
+      </p>
+      <div class="grid">
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+          <h3><span lang="fr">Toutes vos boîtes</span><span lang="en">Any mailbox</span></h3>
+          <p>
+            <span lang="fr">Outlook.com et Microsoft 365 se connectent avec votre compte Microsoft, sans réglage. Les autres fournisseurs se configurent avec leurs paramètres habituels.</span>
+            <span lang="en">Outlook.com and Microsoft 365 sign in with your Microsoft account, nothing to set up. Other providers connect with their usual server settings.</span>
+          </p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></div>
+          <h3><span lang="fr">Recherche immédiate</span><span lang="en">Instant search</span></h3>
+          <p>
+            <span lang="fr">La liste s'affiche aussitôt et la recherche porte sur le texte des messages, même hors connexion. Une recherche sur le serveur retrouve ce qui n'a jamais été ouvert.</span>
+            <span lang="en">The list appears at once and search covers the text of your mail, even offline. A server search finds what was never opened.</span>
+          </p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg></div>
+          <h3><span lang="fr">Lecture protégée</span><span lang="en">Safe reading</span></h3>
+          <p>
+            <span lang="fr">Les images et polices distantes, qui signalent souvent à l'expéditeur que vous avez lu son message, restent bloquées tant que vous ne les affichez pas.</span>
+            <span lang="en">Remote images and fonts, which often tell the sender you opened their mail, stay blocked until you choose to show them.</span>
+          </p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/></svg></div>
+          <h3><span lang="fr">Rédaction en fenêtres</span><span lang="en">Write in windows</span></h3>
+          <p>
+            <span lang="fr">Plusieurs messages en même temps, dans des fenêtres que l'on déplace, agrandit ou réduit. Mise en forme, liens et pièces jointes.</span>
+            <span lang="en">Several messages at once, in windows you can move, resize and minimise. Formatting, links and attachments.</span>
+          </p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg></div>
+          <h3><span lang="fr">Indésirables</span><span lang="en">Junk mail</span></h3>
+          <p>
+            <span lang="fr">Bloquez un expéditeur en un clic. Pour un compte Microsoft, le message est aussi signalé au service anti-spam de Microsoft.</span>
+            <span lang="en">Block a sender in one click. For a Microsoft account, the message is also reported to Microsoft's junk-mail service.</span>
+          </p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></div>
+          <h3><span lang="fr">Sept thèmes</span><span lang="en">Seven themes</span></h3>
+          <p>
+            <span lang="fr">Chacun en mode clair et en mode sombre. En mode sombre, le corps des messages s'assombrit lui aussi.</span>
+            <span lang="en">Each in light and dark mode. In dark mode, the body of your mail is darkened too.</span>
+          </p>
+        </div>
+      </div>
+      <div class="themes" aria-label="Thèmes">
+        <span>mailFlow</span><span>Cristal</span><span>Classique</span><span>Épure</span><span>Récif</span><span>Arène</span><span>Papeterie</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap two">
+      <div>
+        <h2><span lang="fr">Vos messages restent chez vous</span><span lang="en">Your mail stays with you</span></h2>
+        <p class="intro" style="margin-bottom:0">
+          <span lang="fr">Vos courriels, vos mots de passe et vos jetons de connexion sont conservés sur votre ordinateur, dans votre profil Windows. Les identifiants des comptes sont chiffrés avec une clé que Windows protège pour votre seule session.</span>
+          <span lang="en">Your mail, passwords and sign-in tokens are kept on your computer, in your Windows profile. Account credentials are encrypted with a key that Windows protects for your user account alone.</span>
+        </p>
+        <p class="strong-note">
+          <span lang="fr">Aucune télémétrie, aucune mesure d'audience, aucune vérification automatique de mise à jour.</span>
+          <span lang="en">No telemetry, no analytics, no automatic update check.</span>
+        </p>
+      </div>
+      <div>
+        <p style="margin-top:0;color:var(--muted)">
+          <span lang="fr">mailFlow ne contacte que&nbsp;:</span>
+          <span lang="en">mailFlow only connects to:</span>
+        </p>
+        <ul class="hosts">
+          <li>
+            <span lang="fr">les serveurs IMAP et SMTP des comptes que vous ajoutez&nbsp;;</span>
+            <span lang="en">the IMAP and SMTP servers of the accounts you add;</span>
+          </li>
+          <li>
+            <span lang="fr">le service de connexion de Microsoft ou de Google, lorsque vous connectez un compte qui l'utilise&nbsp;;</span>
+            <span lang="en">Microsoft's or Google's sign-in service, when you connect an account that uses it;</span>
+          </li>
+          <li>
+            <span lang="fr">l'adresse d'une image distante d'un message, uniquement après votre clic sur «&nbsp;Afficher&nbsp;»&nbsp;;</span>
+            <span lang="en">the address of a remote image in a mail, only after you click "Afficher" (show);</span>
+          </li>
+          <li>
+            <span lang="fr">l'adresse de signalement de Microsoft, lorsque vous bloquez l'expéditeur d'un compte Microsoft.</span>
+            <span lang="en">Microsoft's junk-reporting address, when you block a sender of a Microsoft account.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap two">
+      <div>
+        <h2><span lang="fr">Installation</span><span lang="en">Installing</span></h2>
+        <p class="intro" style="margin-bottom:0">
+          <span lang="fr">L'installation se fait pour votre seul compte Windows et ne demande aucun droit d'administrateur. La désinstallation passe par Paramètres, puis Applications.</span>
+          <span lang="en">mailFlow installs for your Windows user only and needs no administrator rights. Uninstall it from Settings, then Apps.</span>
+        </p>
+      </div>
+      <div>
+        <ol class="steps">
+          <li><div>
+            <span lang="fr">Téléchargez le fichier d'installation à partir du bouton ci-dessus.</span>
+            <span lang="en">Download the installer with the button above.</span>
+          </div></li>
+          <li><div>
+            <span lang="fr">Ouvrez-le&nbsp;: mailFlow s'installe puis démarre.</span>
+            <span lang="en">Open it: mailFlow installs, then starts.</span>
+          </div></li>
+          <li><div>
+            <span lang="fr">Ajoutez votre premier compte. Pour Outlook.com, il suffit de vous connecter avec votre compte Microsoft.</span>
+            <span lang="en">Add your first account. For Outlook.com, just sign in with your Microsoft account.</span>
+          </div></li>
+        </ol>
+        <div class="warn" id="unsigned-note">
+          <span lang="fr">Les premières versions ne sont pas encore signées&nbsp;: Windows affiche un avertissement avant l'installation. Cliquez sur «&nbsp;Informations complémentaires&nbsp;», puis sur «&nbsp;Exécuter quand même&nbsp;».</span>
+          <span lang="en">Early versions are not signed yet, so Windows shows a warning before installing. Click "More info", then "Run anyway".</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2><span lang="fr">Code source et signature</span><span lang="en">Source code and signing</span></h2>
+      <p class="intro">
+        <span lang="fr">mailFlow est publié sous licence MIT. Chaque version est construite sur GitHub Actions à partir du dépôt public, et seules ces constructions sont soumises à la signature. Signature gratuite du code fournie par <a href="https://about.signpath.io">SignPath.io</a>, certificat de <a href="https://signpath.org">SignPath Foundation</a>.</span>
+        <span lang="en">mailFlow is released under the MIT licence. Every version is built by GitHub Actions from the public repository, and only those builds are submitted for signing. Free code signing provided by <a href="https://about.signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</span>
+      </p>
+      <div class="cta">
+        <a class="btn btn-ghost" href="https://github.com/Marineau/mailflow">
+          <span lang="fr">Dépôt GitHub</span><span lang="en">GitHub repository</span>
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/Marineau/mailflow/releases">
+          <span lang="fr">Toutes les versions</span><span lang="en">All releases</span>
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/Marineau/mailflow/issues">
+          <span lang="fr">Signaler un problème</span><span lang="en">Report a problem</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>mailFlow · <span lang="fr">licence</span><span lang="en">licence</span> <a href="https://github.com/Marineau/mailflow/blob/main/LICENSE">MIT</a></span>
+    <span lang="fr">Cette page n'utilise ni cookie ni mesure d'audience.</span>
+    <span lang="en">This page uses no cookies and no analytics.</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var titles = { fr: 'mailFlow', en: 'mailFlow' };
+    var release = null;
+
+    function setLang(lang) {
+      root.lang = lang;
+      root.dataset.lang = lang;
+      document.title = titles[lang];
+      document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.dataset.setLang === lang));
+      });
+      renderMeta();
+    }
+
+    document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        try { localStorage.setItem('mailflow.site-lang', b.dataset.setLang); } catch (e) {}
+        setLang(b.dataset.setLang);
+      });
+    });
+
+    function size(bytes, lang) {
+      var mb = bytes / 1e6;
+      return lang === 'fr'
+        ? Math.round(mb).toLocaleString('fr-FR') + ' Mo'
+        : Math.round(mb).toLocaleString('en-US') + ' MB';
+    }
+
+    function renderMeta() {
+      if (!release) return;
+      var meta = document.getElementById('meta');
+      var v = release.tag.replace(/^v/, '');
+      meta.innerHTML = '';
+      var fr = document.createElement('span');
+      fr.lang = 'fr';
+      fr.textContent = 'Version ' + v + ', ' + size(release.size, 'fr') + '. Windows 10 et 11, 64 bits. Interface en français.';
+      var en = document.createElement('span');
+      en.lang = 'en';
+      en.textContent = 'Version ' + v + ', ' + size(release.size, 'en') + '. Windows 10 and 11, 64-bit. The interface is in French.';
+      meta.appendChild(fr);
+      meta.appendChild(en);
+    }
+
+    setLang(root.dataset.lang === 'en' ? 'en' : 'fr');
+
+    // The download button points at the releases page until the latest
+    // installer is known; a new release never needs this page to change.
+    fetch('https://api.github.com/repos/Marineau/mailflow/releases/latest', {
+      headers: { Accept: 'application/vnd.github+json' }
+    })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.assets) return;
+        var asset = data.assets.find(function (a) { return /^mailFlow-Setup-.*\.exe$/.test(a.name); });
+        if (!asset) return;
+        document.getElementById('download').href = asset.browser_download_url;
+        release = { tag: data.tag_name, size: asset.size };
+        renderMeta();
+        // A signed release says so in its notes (release.yml writes them).
+        if (/^Signed installer\./.test(data.body || '')) {
+          var note = document.getElementById('unsigned-note');
+          if (note) note.hidden = true;
+        }
+      })
+      .catch(function () { /* the releases page link stays */ });
+  })();
+</script>
+</body>
+</html>

@@ -4,7 +4,8 @@ A desktop mail client for Windows that talks plain IMAP and SMTP. It runs
 entirely on your PC: your mail, your passwords and your sign-in tokens never
 leave it, except to reach the mail servers you configure.
 
-The interface is in French.
+The interface is in French. Project page and download:
+https://marineau.github.io/mailflow/
 
 ## Features
 
