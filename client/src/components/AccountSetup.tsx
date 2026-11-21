@@ -119,7 +119,7 @@ function AccountForm({
   const [fromName, setFromName] = useState('');
   // Gmail offers both ways in; the others have only the one of their preset.
   // `null` until chosen. Signing in with Google takes a Google application:
-  // where mailFlow knows none, the app password is the way that needs nothing
+  // where Pli knows none, the app password is the way that needs nothing
   // but a Google account, so it is the one offered first.
   const [passwordChoice, setUsePassword] = useState<boolean | null>(null);
   const googleAppKnown = Boolean(setup.data?.googleClientId && setup.data.googleSecretConfigured);
@@ -472,7 +472,7 @@ function ConsentWait({
       )}
       <p className="text-sm font-medium">
         {blocked
-          ? `Autorisez mailFlow chez ${providerName}`
+          ? `Autorisez Pli chez ${providerName}`
           : `En attente de votre autorisation chez ${providerName}…`}
       </p>
       <p className="max-w-sm text-sm leading-relaxed text-ink-muted">
@@ -518,7 +518,7 @@ function GoogleAppHelp({
 }) {
   return (
     <div className="flex flex-col gap-3 rounded-md border border-line p-3">
-      <p className="text-sm font-medium">Déclarer mailFlow chez Google (une seule fois)</p>
+      <p className="text-sm font-medium">Déclarer Pli chez Google (une seule fois)</p>
       <ol className="ml-4 list-decimal space-y-1 text-xs leading-relaxed text-ink-muted">
         <li>
           Sur console.cloud.google.com, créez un projet, puis activez l’API Gmail dans « API et

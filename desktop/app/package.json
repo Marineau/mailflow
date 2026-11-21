@@ -1,6 +1,6 @@
 {
   "name": "mailflow",
-  "productName": "mailFlow",
+  "productName": "Pli",
   "description": "Client mail IMAP/SMTP",
   "author": "Marineau",
   "private": true,

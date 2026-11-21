@@ -191,7 +191,7 @@ function readUrlTarget(css: string, from: number): { value: string; end: number;
  * What a reference points at. Only three things may stay: bytes carried by
  * the message (`data:`, `cid:`) and a fragment of the document itself. A web
  * address is held back and can be restored. Everything else — a relative
- * path, which would resolve against mailFlow's own origin, `file:`, a scheme
+ * path, which would resolve against Pli's own origin, `file:`, a scheme
  * nobody asked for — is dropped for good.
  *
  * An `@import` is stricter: a `data:` stylesheet is CSS this scanner has not

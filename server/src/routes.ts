@@ -194,7 +194,7 @@ router.get(
     res.send(
       page(
         'Compte autorisé',
-        `${account.email} est connecté. Vous pouvez fermer cet onglet et revenir à mailFlow.`,
+        `${account.email} est connecté. Vous pouvez fermer cet onglet et revenir à Pli.`,
         // Opened by the « add an account » window with window.open: it may close itself.
         true,
       ),

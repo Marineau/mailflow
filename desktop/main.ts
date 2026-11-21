@@ -34,7 +34,17 @@ const APP_ID = 'com.marineau.mailflow';
 const SESSION_COOKIE = 'mailflow_session';
 
 /**
- * Client id of mailFlow's own Microsoft application, written in by
+ * The app was called mailFlow before it became Pli. Electron names the data
+ * folder after the product, so an install from before the rename would open
+ * on an empty profile: no accounts, no secret key, no theme. Such an install
+ * keeps its folder; a new one gets `%APPDATA%\Pli`. Must run before anything
+ * reads `userData`, the single-instance lock included.
+ */
+const LEGACY_DATA_DIR = path.join(app.getPath('appData'), 'mailFlow');
+if (fs.existsSync(LEGACY_DATA_DIR)) app.setPath('userData', LEGACY_DATA_DIR);
+
+/**
+ * Client id of Pli's own Microsoft application, written in by
  * `build.mjs`. It is what lets someone who installs the app sign in to
  * Outlook.com without registering an application of their own. Public by
  * nature: it travels in the address of the consent page. Empty when the build
@@ -60,8 +70,8 @@ const STOP_TIMEOUT_MS = 5_000;
 const SERVER_ENTRY = path.join(__dirname, '..', 'server', 'dist', 'index.js');
 
 const SPLASH = `data:text/html;charset=utf-8,${encodeURIComponent(
-  `<!doctype html><meta charset="utf-8"><title>mailFlow</title>
-<body style="margin:0;height:100vh;display:grid;place-items:center;background:#14161c;color:#9aa1ae;font:15px/1.6 system-ui,'Segoe UI',sans-serif">Démarrage de mailFlow…</body>`,
+  `<!doctype html><meta charset="utf-8"><title>Pli</title>
+<body style="margin:0;height:100vh;display:grid;place-items:center;background:#14161c;color:#9aa1ae;font:15px/1.6 system-ui,'Segoe UI',sans-serif">Démarrage de Pli…</body>`,
 )}`;
 
 /**
@@ -196,7 +206,7 @@ async function startServer(): Promise<void> {
 
   const key = accountKey();
   const child = utilityProcess.fork(SERVER_ENTRY, [], {
-    serviceName: 'mailFlow server',
+    serviceName: 'Pli server',
     stdio: 'pipe',
     env: {
       // First, so that a value set in the environment still wins.
@@ -279,8 +289,8 @@ async function startFailed(error: Error): Promise<void> {
   server?.kill();
   const { response } = await showMessage({
     type: 'error',
-    title: 'mailFlow',
-    message: 'mailFlow n’a pas pu démarrer.',
+    title: 'Pli',
+    message: 'Pli n’a pas pu démarrer.',
     detail: `${error.message}\n\nJournal : ${serverLogPath()}`,
     buttons: ['Ouvrir le journal', 'Quitter'],
     defaultId: 1,
@@ -293,8 +303,8 @@ async function startFailed(error: Error): Promise<void> {
 async function serverDied(code: number): Promise<void> {
   const { response } = await showMessage({
     type: 'error',
-    title: 'mailFlow',
-    message: 'Le serveur de mailFlow s’est arrêté.',
+    title: 'Pli',
+    message: 'Le serveur de Pli s’est arrêté.',
     detail: `Code ${code}.\n\nJournal : ${serverLogPath()}`,
     buttons: ['Relancer', 'Quitter'],
     defaultId: 0,
@@ -378,7 +388,7 @@ function trayHint(): void {
   }
   tray?.displayBalloon({
     iconType: 'info',
-    title: 'mailFlow reste ouvert',
+    title: 'Pli reste ouvert',
     content: 'Le courrier continue d’arriver. Pour quitter : clic droit sur l’icône, près de l’horloge.',
   });
   try {
@@ -398,10 +408,10 @@ async function createTray(): Promise<void> {
     note(`tray unavailable: ${(error as Error).message}`);
     return;
   }
-  tray.setToolTip('mailFlow');
+  tray.setToolTip('Pli');
   tray.setContextMenu(
     Menu.buildFromTemplate([
-      { label: 'Ouvrir mailFlow', click: showWindow },
+      { label: 'Ouvrir Pli', click: showWindow },
       { type: 'separator' },
       { label: 'Quitter', click: () => app.quit() },
     ]),
@@ -415,7 +425,7 @@ function createWindow(): BrowserWindow {
     height: 840,
     minWidth: 720,
     minHeight: 480,
-    title: 'mailFlow',
+    title: 'Pli',
     backgroundColor: '#14161c',
     // The default menu stays reachable with Alt, for zoom and reload. Its
     // DevTools entry does nothing in the packaged app (`devTools` below).

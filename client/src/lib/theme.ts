@@ -18,7 +18,7 @@ export type Mode = 'light' | 'dark';
 export const THEMES = [
   {
     id: 'mailflow',
-    name: 'mailFlow',
+    name: 'Pli',
     description: "L'habillage d'origine : à plat, discret, un seul accent.",
   },
   {

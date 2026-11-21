@@ -37,7 +37,7 @@ html[data-busy] {
  * `@theme` only registers the tokens with Tailwind, so `bg-canvas` and
  * friends exist. The values that actually apply come from
  * `styles/themes/*.css`, one block per `[data-theme][data-mode]`; the ones
- * below are the mailFlow dark palette, shown if those attributes are missing.
+ * below are the Pli dark palette, shown if those attributes are missing.
  *
  * Two rules keep themes independent of each other:
  *   - a component never names a color outside these tokens;

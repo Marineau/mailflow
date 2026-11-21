@@ -49,7 +49,7 @@ export default function AccountsWindow({ onClose, onAdded, startAdding = false }
   async function remove(account: Account) {
     const confirmed = await confirmDialog({
       title: 'Retirer le compte',
-      message: `Retirer ${account.email} de mailFlow ?\n\nLes mails restent sur le serveur de votre fournisseur. mailFlow oublie le mot de passe ou l’autorisation, ainsi que sa copie locale des en-têtes et des mails ouverts.`,
+      message: `Retirer ${account.email} de Pli ?\n\nLes mails restent sur le serveur de votre fournisseur. Pli oublie le mot de passe ou l’autorisation, ainsi que sa copie locale des en-têtes et des mails ouverts.`,
       confirmLabel: 'Retirer',
       danger: true,
     });

@@ -271,7 +271,7 @@ export const api = {
       accepted: string[];
       rejected: string[];
       copiedTo: string | null;
-      /** `server` : la boîte range elle-même la copie (Outlook.com), mailFlow n'en dépose pas. */
+      /** `server` : la boîte range elle-même la copie (Outlook.com), Pli n'en dépose pas. */
       copiedBy?: 'mailflow' | 'server' | null;
       copyError: string | null;
     }>(`/api/accounts/${accountId}/send`, {

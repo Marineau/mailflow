@@ -65,5 +65,5 @@ export function requireSession(req: Request, res: Response, next: NextFunction):
   res
     .status(401)
     .type('text/plain; charset=utf-8')
-    .send('mailFlow : cette adresse ne répond qu’à la fenêtre de l’application.');
+    .send('Pli : cette adresse ne répond qu’à la fenêtre de l’application.');
 }

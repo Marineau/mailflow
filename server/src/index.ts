@@ -16,7 +16,7 @@ import { backfillSenders } from './senders.js';
 
 // Accounts added from the interface join the `.env` ones before anything syncs.
 const storedAccounts = loadStoredAccounts();
-if (storedAccounts) console.log(`mailFlow — ${storedAccounts} compte(s) ajouté(s) depuis l'interface`);
+if (storedAccounts) console.log(`Pli — ${storedAccounts} compte(s) ajouté(s) depuis l'interface`);
 
 const app = express();
 
@@ -85,7 +85,7 @@ app.get('*', (req, res, next) => {
     .status(503)
     .type('html')
     .send(
-      `<!doctype html><meta charset="utf-8"><title>mailFlow</title>
+      `<!doctype html><meta charset="utf-8"><title>Pli</title>
 <body style="margin:0;height:100vh;display:grid;place-items:center;background:#14161c;color:#e7e9ee;font:15px/1.6 system-ui,'Segoe UI',sans-serif">
 <div style="max-width:30rem;padding:2rem;text-align:center">
 <h1 style="font-size:1.1rem;margin:0 0 .5rem">Interface non compilée</h1>
@@ -101,12 +101,12 @@ watchBlockedMail();
 dropOutdatedBodies();
 
 const indexedSenders = backfillSenders();
-console.log(`mailFlow — ${indexedSenders} expéditeur(s) indexé(s)`);
+console.log(`Pli — ${indexedSenders} expéditeur(s) indexé(s)`);
 
 // Loopback only: the API has no authentication, so listening on every
 // interface would hand the mailbox to anyone on the same network.
 const server = app.listen(PORT, '127.0.0.1', () => {
-  console.log(`mailFlow — API sur http://localhost:${PORT}`);
+  console.log(`Pli — API sur http://localhost:${PORT}`);
 
   if (accounts.length === 0) {
     console.warn("Aucun compte configuré : ajoutez-en un depuis l'interface, ou dans .env (MAIL_1_*).");

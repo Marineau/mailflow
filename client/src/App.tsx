@@ -48,7 +48,7 @@ import { Prefetcher } from './lib/prefetch';
 import { newOpId, reportProgress } from './lib/progress';
 import ProgressFill from './components/ProgressFill';
 
-const APP_NAME = 'mailFlow';
+const APP_NAME = 'Pli';
 
 interface OpenComposer {
   key: number;
@@ -833,7 +833,7 @@ function StandaloneWindow({
 
 /**
  * First run: no account anywhere, neither in `.env` nor added here. Says in
- * three lines what mailFlow is, then hands over to the same form as the
+ * three lines what Pli is, then hands over to the same form as the
  * accounts window. Once the account is added, the accounts query refreshes
  * and the app takes the place of this screen.
  */
@@ -884,8 +884,8 @@ function NeedsConsent({
         <h1 className="text-base font-semibold">Connexion à {account.email}</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
           {google
-            ? 'Google demande votre accord avant que mailFlow puisse lire et envoyer vos mails. Autorisez-le une fois : l’accès se renouvelle ensuite tout seul.'
-            : "Microsoft n'accepte plus les mots de passe pour l'accès IMAP. Autorisez mailFlow une fois : le jeton se renouvelle ensuite tout seul."}
+            ? 'Google demande votre accord avant que Pli puisse lire et envoyer vos mails. Autorisez-le une fois : l’accès se renouvelle ensuite tout seul.'
+            : "Microsoft n'accepte plus les mots de passe pour l'accès IMAP. Autorisez Pli une fois : le jeton se renouvelle ensuite tout seul."}
         </p>
         <a
           href={`/api/accounts/${encodeURIComponent(account.id)}/oauth`}

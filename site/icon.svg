@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <!-- mailFlow's application icon. The blue is the accent of the original
+  <!-- Pli's application icon. The blue is the accent of the original
        theme; the envelope is drawn large and without detail so that it still
        reads at 16 px. Source of mailflow.ico: `npm run desktop:icon`. -->
   <defs>

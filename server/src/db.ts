@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS senders (
 CREATE INDEX IF NOT EXISTS idx_senders_seen ON senders (account, last_seen DESC);
 
 -- Expéditeurs que l'utilisateur a bloqués. La boîte ne connaît pas cette liste :
--- c'est mailFlow qui déplace les messages suivants vers Banned, et qui masque
+-- c'est Pli qui déplace les messages suivants vers Banned, et qui masque
 -- ceux que le serveur a déjà classés dans les indésirables.
 CREATE TABLE IF NOT EXISTS blocked_senders (
   account     TEXT NOT NULL,

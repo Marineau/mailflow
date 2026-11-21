@@ -9,7 +9,7 @@ const { version } = require('../package.json');
 /** @type {import('electron-builder').Configuration} */
 module.exports = {
   appId: 'com.marineau.mailflow',
-  productName: 'mailFlow',
+  productName: 'Pli',
   // One version for the whole project: the root package.json.
   extraMetadata: { version },
   directories: { app: 'desktop/app', output: 'desktop/release' },
@@ -37,7 +37,7 @@ module.exports = {
   // next to Electron's own in the install folder.
   extraFiles: [{ from: 'desktop/app/THIRD-PARTY-NOTICES.txt', to: 'LICENSES.mailflow.txt' }],
   // Doors Electron leaves open by default, each a way for another program to
-  // run code inside mailFlow.exe and read what the session token and the
+  // run code inside Pli.exe and read what the session token and the
   // protected key keep from it. The executable then: does not turn into a
   // plain Node with ELECTRON_RUN_AS_NODE, ignores NODE_OPTIONS, ignores
   // --inspect, and loads its code from app.asar only. `--remote-debugging-port`
@@ -65,7 +65,7 @@ module.exports = {
     perMachine: false,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    shortcutName: 'mailFlow',
-    artifactName: 'mailFlow-Setup-${version}.${ext}',
+    shortcutName: 'Pli',
+    artifactName: 'Pli-Setup-${version}.${ext}',
   },
 };

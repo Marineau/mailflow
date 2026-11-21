@@ -13,7 +13,7 @@ export type SendActivity =
       accepted: string[];
       rejected: string[];
       copiedTo: string | null;
-      /** `server` when the mailbox files the copy itself and mailFlow appends none. */
+      /** `server` when the mailbox files the copy itself and Pli appends none. */
       copiedBy: 'mailflow' | 'server' | null;
       copyError: string | null;
     }

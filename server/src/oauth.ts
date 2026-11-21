@@ -201,7 +201,7 @@ export async function exchangeCode(account: AccountConfig, code: string, verifie
   if (!payload.refresh_token) {
     throw new Error(
       account.oauth?.provider === 'google'
-        ? "Google n'a pas renvoyé de refresh token : retirez l'accès de mailFlow dans votre compte Google, puis recommencez."
+        ? "Google n'a pas renvoyé de refresh token : retirez l'accès de Pli dans votre compte Google, puis recommencez."
         : "Microsoft n'a pas renvoyé de refresh token : le scope `offline_access` manque.",
     );
   }

@@ -75,7 +75,7 @@ function pixelArrow(outline: string, fill: string): string {
   return `<g shape-rendering="crispEdges">${rects}</g>`;
 }
 
-/* ── Vector arrow (Vista, 11, mailFlow, Arène) ────────────────── */
+/* ── Vector arrow (Vista, 11, Pli, Arène) ────────────────── */
 
 const ARROW_PATH = 'M1.5 1.5 L1.5 18.5 L5.6 14.6 L8.4 21 L11 19.9 L8.3 13.6 L13.8 13.6 Z';
 
@@ -132,7 +132,7 @@ function win98(): CursorSet {
   return { frames, interval: 140 };
 }
 
-/* ── Rings (Vista, 11, mailFlow) ──────────────────────────────────────── */
+/* ── Rings (Vista, 11, Pli) ──────────────────────────────────────── */
 
 function arc(cx: number, cy: number, r: number, from: number, to: number): string {
   const rad = (deg: number) => ((deg - 90) * Math.PI) / 180;

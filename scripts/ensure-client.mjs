@@ -136,11 +136,11 @@ const built = readStamp() || Math.round(latestMtime(path.join(distDir, 'index.ht
 
 if (sources > 0 && sources <= built && hasIndex(distDir)) {
   if (!readStamp()) fs.writeFileSync(path.join(distDir, stampName), String(sources));
-  console.log('mailFlow client is up to date.');
+  console.log('Pli client is up to date.');
   process.exit(0);
 }
 
-console.log('mailFlow client is older than the sources. Rebuilding.');
+console.log('Pli client is older than the sources. Rebuilding.');
 fs.rmSync(stagingDir, { recursive: true, force: true });
 
 const tsc = path.join(root, 'node_modules', 'typescript', 'lib', 'tsc.js');
@@ -175,7 +175,7 @@ try {
       if (hasIndex(distDir) && fs.existsSync(previousDir)) {
         fs.rmSync(previousDir, { recursive: true, force: true });
       }
-      console.log('mailFlow client published in place.');
+      console.log('Pli client published in place.');
       process.exit(0);
     } catch (copyErr) {
       console.error(
@@ -196,4 +196,4 @@ try {
   process.exit(hasIndex(distDir) ? 2 : 1);
 }
 
-console.log('mailFlow client published.');
+console.log('Pli client published.');

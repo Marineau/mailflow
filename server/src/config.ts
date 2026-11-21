@@ -195,7 +195,7 @@ export function isGoogleAccount(account: AccountConfig): boolean {
 
 /**
  * The provider files every message submitted over its SMTP into « Envoyés »
- * itself: Exchange does, and so does Gmail. A copy appended by mailFlow would
+ * itself: Exchange does, and so does Gmail. A copy appended by Pli would
  * be a duplicate.
  */
 export function serverFilesSentMail(account: AccountConfig): boolean {

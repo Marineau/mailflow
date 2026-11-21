@@ -1,11 +1,11 @@
-# mailFlow
+# Pli
 
 A desktop mail client for Windows that talks plain IMAP and SMTP. It runs
 entirely on your PC: your mail, your passwords and your sign-in tokens never
 leave it, except to reach the mail servers you configure.
 
 The interface is in French. Project page and download:
-https://marineau.github.io/mailflow/
+https://marineau.github.io/pli/
 
 ## Features
 
@@ -23,20 +23,21 @@ https://marineau.github.io/mailflow/
   attachments.
 - **Junk handling.** Block a sender locally; for Microsoft accounts, the mail
   is also reported to Microsoft's junk-mail service.
-- **Themes.** Seven skins (mailFlow, Cristal, Classique, Épure, Récif, Arène,
+- **Themes.** Seven skins (Pli, Cristal, Classique, Épure, Récif, Arène,
   Papeterie), each in light and dark mode.
-- **Stays in the tray.** Closing the window keeps mailFlow running next to the
+- **Stays in the tray.** Closing the window keeps Pli running next to the
   clock and notifies you of new mail.
 
 ## Install
 
-Download `mailFlow-Setup-<version>.exe` from the
+Download `Pli-Setup-<version>.exe` from the
 [Releases](../../releases) page and run it. It installs for the current
 Windows user only and needs no administrator rights. Uninstall it from
 Windows Settings → Apps.
 
-Your data lives in `%APPDATA%\mailFlow`. Account secrets there are encrypted
-with a key that Windows protects for your user account.
+Your data lives in `%APPDATA%\Pli` (`%APPDATA%\mailFlow` for an install
+made before the app was renamed). Account secrets there are encrypted with a
+key that Windows protects for your user account.
 
 ## Build from source
 
@@ -59,7 +60,7 @@ This program will not transfer any information to other networked systems
 unless specifically requested by the user or the person installing or
 operating it.
 
-In practice, mailFlow connects only to:
+In practice, Pli connects only to:
 
 - the IMAP and SMTP servers of the accounts you add;
 - Microsoft's or Google's sign-in service, when you connect an account that

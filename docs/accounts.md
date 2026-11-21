@@ -1,6 +1,6 @@
 # Mail accounts
 
-mailFlow talks plain IMAP + SMTP. Any provider that accepts those works; the
+Pli talks plain IMAP + SMTP. Any provider that accepts those works; the
 only question is how it logs in.
 
 ## What works
@@ -11,7 +11,7 @@ only question is how it logs in.
 | Microsoft 365 work/school | OAuth2, tenant `common` | Untested; the tenant admin may have to consent |
 | Gmail | OAuth2, Google (added 2026-11-18) | Code written, never run against Google |
 | Gmail | App password (needs 2-step verification) | Untested |
-| o2switch, Hostinger, iCloud, any IMAP host | Password | Generic path; no account of these tested in mailFlow |
+| o2switch, Hostinger, iCloud, any IMAP host | Password | Generic path; no account of these tested in Pli |
 
 Outlook.com refuses passwords, app passwords included (basic auth off since
 2024-09-16).
@@ -67,7 +67,7 @@ the mail server.
 Redirect URI for both: `http://localhost:4100/api/oauth/callback`
 (`PUBLIC_URL` changes the origin).
 
-This is the developer's job, done once for mailFlow, not something a user of
+This is the developer's job, done once for Pli, not something a user of
 the installed app does: the Windows app ships the Microsoft client id
 (`docs/packaging.md` §8). No Google application is shipped; Gmail users of the
 installed app go through an app password.
@@ -96,5 +96,5 @@ lift that for personal use behind an « unverified app » warning; this has not
 been checked.
 
 Gmail, like Exchange, files mail sent through its SMTP into Sent itself, so
-mailFlow skips its own APPEND copy for it (`serverFilesSentMail` in
+Pli skips its own APPEND copy for it (`serverFilesSentMail` in
 `config.ts`).

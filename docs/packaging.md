@@ -1,4 +1,4 @@
-# Packaging mailFlow as an installable Windows client
+# Packaging Pli as an installable Windows client
 
 Status, 2026-11-18: phases 2 and 3 are built and run on the development PC;
 the installer has not been run on a clean machine, and nobody but the owner
@@ -21,7 +21,7 @@ Target: other people download an installer and get a native-window app.
 | Pure-JS deps | imapflow, mailparser, nodemailer, sanitize-html, cors, dotenv | Ship as-is. |
 | Client | React 19, Vite 6, Tailwind v4, TipTap 3, TanStack Query/Virtual; build is 1.7 MB | Already a static bundle served by Express. No change needed. |
 | Config | `.env` at project root (`MAIL_x_*`, OAuth client IDs, `CACHE_MAX_MB`) | End users will not edit a `.env`. Accounts already have an in-app path (`accountStore.ts`); OAuth client IDs become build-time constants. |
-| Data | `server/data/` resolved from the source file location (`config.ts`: `DATA_DIR`) | Inside an install dir under Program Files this is read-only and wiped on update. Must move to `%APPDATA%\mailFlow`. |
+| Data | `server/data/` resolved from the source file location (`config.ts`: `DATA_DIR`) | Inside an install dir under Program Files this is read-only and wiped on update. Must move to `%APPDATA%\Pli`. |
 | Secrets | AES-256-GCM, key in `data/secret.key` next to the data (debt register) | Electron `safeStorage` wraps the key with Windows DPAPI, no extra native dependency. Fixes that debt item. |
 | Network | `app.listen(PORT)` with no host = all interfaces, port fixed at 4100, no auth | **Blocker for distribution**: on a café Wi-Fi anyone on the LAN can read the mailbox and add/remove accounts. |
 | OAuth | Microsoft: public client + PKCE, redirect `http://localhost:4100/api/oauth/callback`. Google: "Web application" client with a secret. Consent in a browser popup. | Works in principle; see §4 for the registration and verification work. |
@@ -74,7 +74,7 @@ window, and a crash can be restarted by the main process.
    its `.node` file, NSIS target.
 4. NSIS options: per-user install (`perMachine: false`, no admin prompt),
    Start-menu and desktop shortcuts, "launch at login" left as an in-app toggle.
-5. Publish to GitHub Releases under `Marineau/mailflow`; `electron-updater`
+5. Publish to GitHub Releases under `Marineau/pli`; `electron-updater`
    checks on start and installs on quit.
 
 ## 3. Windows integration (in priority order)
@@ -154,8 +154,8 @@ desktop/
 |---|---|
 | `npm run desktop:stage` | Typechecks server, client and `desktop/`, then fills `desktop/app`. |
 | `npm run desktop:start` | Stage, then runs it with the Electron of `node_modules`. |
-| `npm run desktop:pack` | Stage, then `desktop/release/win-unpacked/mailFlow.exe`. |
-| `npm run desktop:dist` | Stage, then `desktop/release/mailFlow-Setup-<version>.exe`. |
+| `npm run desktop:pack` | Stage, then `desktop/release/win-unpacked/Pli.exe`. |
+| `npm run desktop:dist` | Stage, then `desktop/release/Pli-Setup-<version>.exe`. |
 
 The version is the one of the root `package.json`.
 
@@ -178,10 +178,13 @@ The version is the one of the root `package.json`.
 
 ### Behaviour of the shell
 
-- **Data**: `%APPDATA%\mailFlow\data` (`MAILFLOW_DATA_DIR`, which the shell
+- **Data folder name**: the app was called mailFlow until 0.1.0. `main.ts`
+  keeps `%APPDATA%\mailFlow` when it exists, so an older install keeps its
+  accounts; a new install uses `%APPDATA%\Pli`. The paths below say `Pli`.
+- **Data**: `%APPDATA%\Pli\data` (`MAILFLOW_DATA_DIR`, which the shell
   sets unless it is already in the environment). The Chromium profile is next
-  to it in `%APPDATA%\mailFlow`. Server output goes to
-  `%APPDATA%\mailFlow\logs\server.log`; the previous launch is kept as
+  to it in `%APPDATA%\Pli`. Server output goes to
+  `%APPDATA%\Pli\logs\server.log`; the previous launch is kept as
   `server.previous.log`.
 - **Port**: 4100, then 4101 to 4109, then any free one. Fixed candidates keep
   the window's origin, hence the theme in `localStorage`, across restarts. On
@@ -258,7 +261,7 @@ running on 4100:
 ### Secrets key and tokens
 
 - The key of `secretBox.ts` no longer lives in the data folder. The main
-  process keeps it in `%APPDATA%\mailFlow\secret.key.bin`, encrypted by
+  process keeps it in `%APPDATA%\Pli\secret.key.bin`, encrypted by
   `safeStorage` (DPAPI, bound to the Windows account), and hands it to the
   server as `MAILFLOW_SECRET_KEY`.
 - A `data\secret.key` written by an earlier build is adopted, then deleted.
@@ -275,7 +278,7 @@ running on 4100:
 
 ### Tray and close
 
-- A tray icon (the executable's own icon) with « Ouvrir mailFlow » and
+- A tray icon (the executable's own icon) with « Ouvrir Pli » and
   « Quitter »; a click shows the window.
 - Closing the window hides it; the server and its IMAP connections stay. The
   first time, a balloon says so (`shell.json` remembers it was said).
@@ -364,7 +367,7 @@ the client ships its own. Thunderbird does exactly that.
 
 ### Microsoft: built in
 
-- `desktop/build.mjs` writes mailFlow's Microsoft client id into
+- `desktop/build.mjs` writes Pli's Microsoft client id into
   `desktop/app/dist/main.js`. It takes `MS_OAUTH_CLIENT_ID` from the
   environment or `.env`, else the client id of the first Microsoft account in
   `.env`: the rule of `oauthDefaults` in `server/src/config.ts`. A client id
@@ -386,7 +389,7 @@ the client ships its own. Thunderbird does exactly that.
 
 ### Google: not built in
 
-Signing in with Google needs a Google Cloud project of mailFlow's own, and
+Signing in with Google needs a Google Cloud project of Pli's own, and
 the scope `https://mail.google.com/` is restricted (§4): unverified, the
 application is capped at 100 users behind a warning page, and in « Testing »
 each user must be listed by hand and signs in again every 7 days. Nothing was

@@ -3,7 +3,7 @@
      Paste into SignPath as the artifact configuration with slug `exe`. -->
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
   <zip-file>
-    <pe-file path="mailFlow.exe" product-name="mailFlow">
+    <pe-file path="Pli.exe" product-name="Pli">
       <authenticode-sign/>
     </pe-file>
   </zip-file>

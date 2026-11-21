@@ -119,9 +119,9 @@ export function writeNotices({ root, appDir, serverInputs, outFile }) {
     );
 
   const header = [
-    'mailFlow — third-party notices',
+    'Pli — third-party notices',
     '',
-    'mailFlow includes the software and fonts listed below, each under its own',
+    'Pli includes the software and fonts listed below, each under its own',
     'licence. The notices of Electron and Chromium are in LICENSE.electron.txt and',
     'LICENSES.chromium.html, next to this file. SQLite, compiled into',
     'better-sqlite3, is in the public domain.',

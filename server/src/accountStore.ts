@@ -163,7 +163,7 @@ export function buildAccount(input: AccountInput): AccountConfig {
   const email = String(input?.email ?? '').trim();
   if (!EMAIL.test(email)) throw badRequest('Adresse e-mail invalide.');
   if (accounts.some((a) => a.email.toLowerCase() === email.toLowerCase())) {
-    throw badRequest(`${email} est déjà configuré dans mailFlow.`);
+    throw badRequest(`${email} est déjà configuré dans Pli.`);
   }
 
   const imap = server(input.imap, 'IMAP', email);

@@ -95,7 +95,7 @@ export default function ThemeModal({ onClose }: Props) {
       <div className="mf-window-body flex min-h-0 flex-col">
         <div className="min-h-0 overflow-y-auto p-4">
           <p className="text-sm leading-relaxed text-ink-muted">
-            Le thème change l'habillage de mailFlow. Le mode clair ou sombre se règle à part, avec
+            Le thème change l'habillage de Pli. Le mode clair ou sombre se règle à part, avec
             le bouton voisin dans la barre du haut, et vaut pour tous les thèmes.
           </p>
 
